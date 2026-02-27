@@ -115,12 +115,12 @@ export const LANGUAGES = {
         },
         {
           name: 'Google IT Support Professional Certificate',
-          imageUrl: '/badges/google-it-support.png',
+          imageUrl: './badges/google-it-support.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Python Essentials 1',
-          imageUrl: '/badges/python-essentials-1.png',
+          imageUrl: './badges/python-essentials-1.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
