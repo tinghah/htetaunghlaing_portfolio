@@ -7,7 +7,7 @@ export const LANGUAGES = {
       name: 'HTET AUNG HLAING',
       nickname: '霆 | ting',
       tagline: 'IT Systems & Digital Transformation Lead',
-      profileImage: '/profile.png',
+      profileImage: './profile.png',
       description: [
         "Strategic IT Professional specializing in enterprise system architecture (SAP, MES, WMS) and digital transformation. Proven track record of aligning complex technical infrastructure with manufacturing and corporate business objectives.",
         "Adept at leading full-lifecycle ERP integrations, leveraging data analytics (Power BI, SQL, Python), and pioneering AI tool adoption to optimize cross-functional processes, drive operational efficiency, and deliver scalable, high-impact technology solutions."
@@ -21,7 +21,7 @@ export const LANGUAGES = {
         telegram: 'https://t.me/ting_hah',
         telegramUser: '@ting_hah',
         wechat: 'htetaunghlaing_ting',
-        wechatQr: '/wechat-qr.png',
+        wechatQr: './wechat-qr.png',
         teams: 'ting.hah@pouchen.com',
         teamsChat: 'https://teams.microsoft.com/l/chat/0/0?users=ting.hah@pouchen.com',
         whatsapp: 'https://wa.me/959786579514',
@@ -34,7 +34,7 @@ export const LANGUAGES = {
     resume: {
       title: 'Curriculum Vitae',
       download: 'Download Executive CV',
-      file: '/resume.pdf',
+      file: './resume.pdf',
     },
     prompts: {
       title: 'ai-executive-assistant ~ Ask anything about Htet Aung Hlaing',
@@ -105,12 +105,12 @@ export const LANGUAGES = {
       badges: [
         {
           name: 'ChatGPT Foundations for Teachers',
-          imageUrl: '/badges/chatgpt-foundations.png',
+          imageUrl: './badges/chatgpt-foundations.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Chatbot Building Essentials with IBM watsonx Assistant (V2)',
-          imageUrl: '/badges/ibm-watsonx-assistant.png',
+          imageUrl: './badges/ibm-watsonx-assistant.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
@@ -125,27 +125,27 @@ export const LANGUAGES = {
         },
         {
           name: 'Python Essentials 2',
-          imageUrl: '/badges/python-essentials-2.png',
+          imageUrl: './badges/python-essentials-2.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Data Analytics Essentials',
-          imageUrl: '/badges/data-analytics-essentials.png',
+          imageUrl: './badges/data-analytics-essentials.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Getting Started in Cybersecurity 1.0',
-          imageUrl: '/badges/fortinet-getting-started.png',
+          imageUrl: './badges/fortinet-getting-started.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Introduction to the Threat Landscape 1.0',
-          imageUrl: '/badges/fortinet-threat-landscape.png',
+          imageUrl: './badges/fortinet-threat-landscape.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Fortinet FortiSASE 25 Administrator',
-          imageUrl: '/badges/fortinet-cybersecurity.png',
+          imageUrl: './badges/fortinet-cybersecurity.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         }
       ],
@@ -156,7 +156,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Apr 8, 2025',
           link: 'https://coursera.org/verify/professional-cert/EW1LM2G9O855',
-          image: '/certificates/google-project-management.png' 
+          image: './certificates/google-project-management.png' 
         },
         { 
           name: 'Google IT Support', 
@@ -164,7 +164,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Apr 12, 2025',
           link: 'https://coursera.org/verify/professional-cert/JA4MIB7UNM7Q',
-          image: '/certificates/google-it-support.png' 
+          image: './certificates/google-it-support.png' 
         },
         { 
           name: 'Building AI Powered Chatbots Without Programming', 
@@ -172,7 +172,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Aug 14, 2025',
           link: 'https://coursera.org/verify/OJQC315DBZZT',
-          image: '/certificates/ibm-ai-chatbots.png' 
+          image: './certificates/ibm-ai-chatbots.png' 
         },
         { 
           name: 'Build Intelligent Agents Using DeepSeek & N8N', 
@@ -180,7 +180,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Aug 14, 2025',
           link: 'https://coursera.org/verify/OT538QO6X598',
-          image: '/certificates/deepseek-n8n.png' 
+          image: './certificates/deepseek-n8n.png' 
         },
         { 
           name: 'Train The Trainer Program', 
@@ -188,7 +188,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Sep 22, 2025',
           link: '',
-          image: '/certificates/train-the-trainer.png' 
+          image: './certificates/train-the-trainer.png' 
         },
         { 
           name: 'Leadership Development', 
@@ -196,7 +196,7 @@ export const LANGUAGES = {
           year: 2026, 
           date: 'Feb 21, 2026',
           link: '',
-          image: '/certificates/leadership-development.png' 
+          image: './certificates/leadership-development.png' 
         },
       ],
     },
@@ -209,7 +209,7 @@ export const LANGUAGES = {
       name: 'HTET AUNG HLAING',
       nickname: '霆 | ting',
       tagline: 'အိုင်တီစနစ်များနှင့် ဒစ်ဂျစ်တယ်အသွင်ကူးပြောင်းရေး ဦးဆောင်သူ',
-      profileImage: '/profile.png',
+      profileImage: './profile.png',
       description: [
         "လုပ်ငန်းသုံးစနစ် ဗိသုကာပညာ (SAP, MES, WMS) နှင့် ဒစ်ဂျစ်တယ်အသွင်ကူးပြောင်းရေးတွင် အထူးပြုသော မဟာဗျူဟာမြောက် အိုင်တီကျွမ်းကျင်သူ။ ရှုပ်ထွေးသော နည်းပညာဆိုင်ရာ အခြေခံအဆောက်အအုံများကို ကော်ပိုရိတ်စီးပွားရေး ရည်မှန်းချက်များနှင့် ကိုက်ညီအောင် လုပ်ဆောင်နိုင်သူ။",
         "ERP ပေါင်းစပ်မှုများကို ဦးဆောင်ခြင်း၊ ဒေတာခွဲခြမ်းစိတ်ဖြာမှု (Power BI, SQL, Python) ကို အသုံးချခြင်းနှင့် လုပ်ငန်းစွမ်းဆောင်ရည် မြှင့်တင်ရန် AI ကိရိယာများကို ရှေ့ဆောင်အသုံးပြုသူ။"
@@ -223,7 +223,7 @@ export const LANGUAGES = {
         telegram: 'https://t.me/ting_hah',
         telegramUser: '@ting_hah',
         wechat: 'htetaunghlaing_ting',
-        wechatQr: '/wechat-qr.png',
+        wechatQr: './wechat-qr.png',
         teams: 'ting.hah@pouchen.com',
         teamsChat: 'https://teams.microsoft.com/l/chat/0/0?users=ting.hah@pouchen.com',
         whatsapp: 'https://wa.me/959786579514',
@@ -236,7 +236,7 @@ export const LANGUAGES = {
     resume: {
       title: 'ကိုယ်ရေးရာဇဝင်',
       download: 'Executive CV ကို ရယူရန်',
-      file: '/resume.pdf',
+      file: './resume.pdf',
     },
     prompts: {
       title: 'ai-executive-assistant ~ Htet Aung Hlaing အကြောင်း မေးမြန်းပါ',
@@ -259,6 +259,23 @@ export const LANGUAGES = {
             'စက်ရုံ၏ လုပ်ငန်းလည်ပတ်မှု အခက်အခဲများကို ဖြေရှင်းရန် "PMA Nesting" ဝဘ်ဆော့ဖ်ဝဲကို တည်ဆောက်ခဲ့သည်။',
             'AI ကိရိယာများကို နေ့စဉ်လုပ်ငန်းခွင်တွင် ပေါင်းစပ်အသုံးပြုခြင်းဖြင့် ဒစ်ဂျစ်တယ်အသွင်ကူးပြောင်းရေးကို ဖော်ဆောင်ခဲ့သည်။'
           ],
+        },
+        {
+          role: 'Network & System Infrastructure Engineer',
+          company: 'Sakura, SUZUKI, ISUZU, MMC',
+          duration: '၂၀၂၃ - ၂၀၂၅',
+          description: [
+            'ခိုင်မာသော ကော်ပိုရိတ် အိုင်တီ အခြေခံအဆောက်အအုံများကို တည်ဆောက် ထိန်းသိမ်းခဲ့ပြီး စနစ်လည်ပတ်မှု ၉၉.၉% အထိ ရှိစေရန် ဆောင်ရွက်ခဲ့သည်။',
+            'ကော်ပိုရိတ် လုံခြုံရေး စံနှုန်းများနှင့်အညီ လုံခြုံရေးနှင့် ဆက်သွယ်ရေး စနစ်များကို ဦးဆောင် စီမံခန့်ခွဲခဲ့သည်။'
+          ],
+        },
+        {
+          role: 'IT Systems Administrator',
+          company: 'Double Packing MM Co.,Ltd',
+          duration: '၂၀၂၀ - ၂၀၂၂',
+          description: [
+            'ထုတ်လုပ်မှု စက်ရုံအတွက် နေ့စဉ် လုပ်ငန်းစဉ်များ ချောမွေ့စေရန် Active Directory နှင့် ဖိုင်ဆာဗာများ အပါအဝင် အမာခံ အိုင်တီ အခြေခံ အဆောက်အအုံများကို စီမံခန့်ခွဲခဲ့သည်။'
+          ],
         }
       ],
     },
@@ -268,6 +285,14 @@ export const LANGUAGES = {
         { 
           name: 'SAP MES Enterprise Integration', 
           description: 'Adidas စက်ရုံကြီးတစ်ခုအတွက် SAP MES စနစ်ကို အောင်မြင်စွာ တပ်ဆင်အသုံးပြုနိုင်အောင် ဦးဆောင်ခဲ့သည်။' 
+        },
+        { 
+          name: 'PMA Nesting Operational Solution', 
+          description: 'စက်ရုံ၏ လုပ်ငန်းလည်ပတ်မှုဆိုင်ရာ အခက်အခဲများကို ဖြေရှင်းရန် PMA Nesting ဝဘ်ဆော့ဖ်ဝဲကို တည်ဆောက်ခဲ့သည်။' 
+        },
+        { 
+          name: 'Corporate AI & Digital Upskilling', 
+          description: 'ရုံးဝန်ထမ်းများနှင့် အဓိကအသုံးပြုသူများအတွက် AI ကိရိယာများနှင့် ဒစ်ဂျစ်တယ်လုပ်ငန်းခွင်ဆိုင်ရာ သင်တန်းများကို ဒီဇိုင်းထုတ် ပို့ချခဲ့သည်။' 
         }
       ],
     },
@@ -281,47 +306,47 @@ export const LANGUAGES = {
       badges: [
         {
           name: 'ChatGPT Foundations for Teachers',
-          imageUrl: '/badges/chatgpt-foundations.png',
+          imageUrl: './badges/chatgpt-foundations.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Chatbot Building Essentials with IBM watsonx Assistant (V2)',
-          imageUrl: '/badges/ibm-watsonx-assistant.png',
+          imageUrl: './badges/ibm-watsonx-assistant.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Google IT Support Professional Certificate',
-          imageUrl: '/badges/google-it-support.png',
+          imageUrl: './badges/google-it-support.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Python Essentials 1',
-          imageUrl: '/badges/python-essentials-1.png',
+          imageUrl: './badges/python-essentials-1.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Python Essentials 2',
-          imageUrl: '/badges/python-essentials-2.png',
+          imageUrl: './badges/python-essentials-2.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Data Analytics Essentials',
-          imageUrl: '/badges/data-analytics-essentials.png',
+          imageUrl: './badges/data-analytics-essentials.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Getting Started in Cybersecurity 1.0',
-          imageUrl: '/badges/fortinet-getting-started.png',
+          imageUrl: './badges/fortinet-getting-started.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Introduction to the Threat Landscape 1.0',
-          imageUrl: '/badges/fortinet-threat-landscape.png',
+          imageUrl: './badges/fortinet-threat-landscape.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Fortinet FortiSASE 25 Administrator',
-          imageUrl: '/badges/fortinet-cybersecurity.png',
+          imageUrl: './badges/fortinet-cybersecurity.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         }
       ],
@@ -332,7 +357,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Apr 8, 2025',
           link: 'https://coursera.org/verify/professional-cert/EW1LM2G9O855',
-          image: '/certificates/google-project-management.png' 
+          image: './certificates/google-project-management.png' 
         },
         { 
           name: 'Google IT Support', 
@@ -340,7 +365,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Apr 12, 2025',
           link: 'https://coursera.org/verify/professional-cert/JA4MIB7UNM7Q',
-          image: '/certificates/google-it-support.png' 
+          image: './certificates/google-it-support.png' 
         },
         { 
           name: 'Building AI Powered Chatbots Without Programming', 
@@ -348,7 +373,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Aug 14, 2025',
           link: 'https://coursera.org/verify/OJQC315DBZZT',
-          image: '/certificates/ibm-ai-chatbots.png' 
+          image: './certificates/ibm-ai-chatbots.png' 
         },
         { 
           name: 'Build Intelligent Agents Using DeepSeek & N8N', 
@@ -356,7 +381,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Aug 14, 2025',
           link: 'https://coursera.org/verify/OT538QO6X598',
-          image: '/certificates/deepseek-n8n.png' 
+          image: './certificates/deepseek-n8n.png' 
         },
         { 
           name: 'Train The Trainer Program', 
@@ -364,7 +389,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Sep 22, 2025',
           link: '',
-          image: '/certificates/train-the-trainer.png' 
+          image: './certificates/train-the-trainer.png' 
         },
         { 
           name: 'Leadership Development', 
@@ -372,7 +397,7 @@ export const LANGUAGES = {
           year: 2026, 
           date: 'Feb 21, 2026',
           link: '',
-          image: '/certificates/leadership-development.png' 
+          image: './certificates/leadership-development.png' 
         }
       ],
     },
@@ -385,7 +410,7 @@ export const LANGUAGES = {
       name: 'HTET AUNG HLAING',
       nickname: '霆 | ting',
       tagline: 'IT 系统与数字化转型负责人',
-      profileImage: '/profile.png',
+      profileImage: './profile.png',
       description: [
         "战略 IT 专业人士，专注于企业系统架构 (SAP, MES, WMS) 和数字化转型。在将复杂的 IT 基础设施与制造和企业业务目标对齐方面拥有良好的记录。",
         "擅长领导完整的 ERP 集成生命周期，利用数据分析 (Power BI, SQL, Python)，并率先采用 AI 工具来优化跨职能流程。"
@@ -399,7 +424,7 @@ export const LANGUAGES = {
         telegram: 'https://t.me/ting_hah',
         telegramUser: '@ting_hah',
         wechat: 'htetaunghlaing_ting',
-        wechatQr: '/wechat-qr.png',
+        wechatQr: './wechat-qr.png',
         teams: 'ting.hah@pouchen.com',
         teamsChat: 'https://teams.microsoft.com/l/chat/0/0?users=ting.hah@pouchen.com',
         whatsapp: 'https://wa.me/959786579514',
@@ -412,7 +437,7 @@ export const LANGUAGES = {
     resume: {
       title: '履历',
       download: '下载执行简历',
-      file: '/resume.pdf',
+      file: './resume.pdf',
     },
     prompts: {
       title: 'ai-executive-assistant ~ 咨询关于 Htet Aung Hlaing 的信息',
@@ -435,6 +460,23 @@ export const LANGUAGES = {
             '架构并部署了 "PMA Nesting"，这是一个旨在解决工厂现场运营瓶颈的定制本地企业 Web 解决方案。',
             '通过将 AI 工具集成到日常工作流程中并开展 AI 技能培训，倡导数字化转型。'
           ],
+        },
+        {
+          role: '网络与系统基础设施工程师',
+          company: 'Sakura, SUZUKI, ISUZU, MMC',
+          duration: '2023 - 2025',
+          description: [
+            '架构并维护了跨多个企业设施（展厅、车间、公司办公室）的弹性企业 IT 基础设施，确保 99.9% 的系统运行时间。',
+            '领导了企业级安全、通信（PABX）和访问控制系统的集成与管理。'
+          ],
+        },
+        {
+          role: 'IT 系统管理员',
+          company: 'Double Packing MM Co.,Ltd',
+          duration: '2020 - 2022',
+          description: [
+            '管理核心 IT 基础设施，包括 Active Directory、文件服务器和网络硬件，为制造工厂的日常运营提供无缝支持。'
+          ],
         }
       ],
     },
@@ -444,6 +486,14 @@ export const LANGUAGES = {
         { 
           name: 'SAP MES 企业集成', 
           description: '领导了一家大型阿迪达斯制造工厂的 SAP 制造执行系统的部署、UAT 和上线。' 
+        },
+        { 
+          name: 'PMA Nesting 运营解决方案', 
+          description: '架构并开发了本地化企业 Web 应用程序，直接提高了现场效率。' 
+        },
+        { 
+          name: '企业 AI 与数字化技能提升', 
+          description: '为办公室工作人员和关键用户设计并提供全面的培训计划，重点是 AI 工具集成。' 
         }
       ],
     },
@@ -457,47 +507,47 @@ export const LANGUAGES = {
       badges: [
         {
           name: 'ChatGPT Foundations for Teachers',
-          imageUrl: '/badges/chatgpt-foundations.png',
+          imageUrl: './badges/chatgpt-foundations.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Chatbot Building Essentials with IBM watsonx Assistant (V2)',
-          imageUrl: '/badges/ibm-watsonx-assistant.png',
+          imageUrl: './badges/ibm-watsonx-assistant.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Google IT Support Professional Certificate',
-          imageUrl: '/badges/google-it-support.png',
+          imageUrl: './badges/google-it-support.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Python Essentials 1',
-          imageUrl: '/badges/python-essentials-1.png',
+          imageUrl: './badges/python-essentials-1.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Python Essentials 2',
-          imageUrl: '/badges/python-essentials-2.png',
+          imageUrl: './badges/python-essentials-2.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Data Analytics Essentials',
-          imageUrl: '/badges/data-analytics-essentials.png',
+          imageUrl: './badges/data-analytics-essentials.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Getting Started in Cybersecurity 1.0',
-          imageUrl: '/badges/fortinet-getting-started.png',
+          imageUrl: './badges/fortinet-getting-started.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Introduction to the Threat Landscape 1.0',
-          imageUrl: '/badges/fortinet-threat-landscape.png',
+          imageUrl: './badges/fortinet-threat-landscape.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         },
         {
           name: 'Fortinet FortiSASE 25 Administrator',
-          imageUrl: '/badges/fortinet-cybersecurity.png',
+          imageUrl: './badges/fortinet-cybersecurity.png',
           verifyUrl: 'https://www.credly.com/users/htetaunghlaing/badges#credly'
         }
       ],
@@ -508,7 +558,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Apr 8, 2025',
           link: 'https://coursera.org/verify/professional-cert/EW1LM2G9O855',
-          image: '/certificates/google-project-management.png' 
+          image: './certificates/google-project-management.png' 
         },
         { 
           name: 'Google IT Support', 
@@ -516,7 +566,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Apr 12, 2025',
           link: 'https://coursera.org/verify/professional-cert/JA4MIB7UNM7Q',
-          image: '/certificates/google-it-support.png' 
+          image: './certificates/google-it-support.png' 
         },
         { 
           name: 'Building AI Powered Chatbots Without Programming', 
@@ -524,7 +574,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Aug 14, 2025',
           link: 'https://coursera.org/verify/OJQC315DBZZT',
-          image: '/certificates/ibm-ai-chatbots.png' 
+          image: './certificates/ibm-ai-chatbots.png' 
         },
         { 
           name: 'Build Intelligent Agents Using DeepSeek & N8N', 
@@ -532,7 +582,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Aug 14, 2025',
           link: 'https://coursera.org/verify/OT538QO6X598',
-          image: '/certificates/deepseek-n8n.png' 
+          image: './certificates/deepseek-n8n.png' 
         },
         { 
           name: 'Train The Trainer Program', 
@@ -540,7 +590,7 @@ export const LANGUAGES = {
           year: 2025, 
           date: 'Sep 22, 2025',
           link: '',
-          image: '/certificates/train-the-trainer.png' 
+          image: './certificates/train-the-trainer.png' 
         },
         { 
           name: 'Leadership Development', 
@@ -548,7 +598,7 @@ export const LANGUAGES = {
           year: 2026, 
           date: 'Feb 21, 2026',
           link: '',
-          image: '/certificates/leadership-development.png' 
+          image: './certificates/leadership-development.png' 
         }
       ],
     },
@@ -556,3 +606,29 @@ export const LANGUAGES = {
 };
 
 export type LanguageKey = keyof typeof LANGUAGES;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          
