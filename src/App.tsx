@@ -9,6 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 const API_KEY = process.env.GEMINI_API_KEY;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 export default function App() {
   const [language, setLanguage] = useState<LanguageKey>('en');
@@ -66,28 +67,73 @@ export default function App() {
     if (!promptInput.trim()) return;
     setIsLoading(true);
     setAiResponse('');
-    try {
-      if (!API_KEY) throw new Error('GEMINI_API_KEY is not set.');
-      const ai = new GoogleGenAI({ apiKey: API_KEY });
-      const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `Based on the following resume profile:
-        Name: ${lang.profile.name}
-        Tagline: ${lang.profile.tagline}
-        Description: ${lang.profile.description.join(' ')}
-        Contact: ${JSON.stringify(lang.profile.contact)}
-        
-        Answer the following question in English:
-        ${promptInput}`,
-      });
-      setAiResponse(response.text || 'No response from AI.');
-    } catch (error) {
-      console.error('Error generating AI response:', error);
-      setAiResponse('Error: Could not get a response from AI. Please try again later.');
-    } finally {
-      setIsLoading(false);
-      setPromptInput('');
+    
+    const prompt = `Based on the following resume profile:
+    Name: ${lang.profile.name}
+    Tagline: ${lang.profile.tagline}
+    Description: ${lang.profile.description.join(' ')}
+    Contact: ${JSON.stringify(lang.profile.contact)}
+    
+    Answer the following question in English:
+    ${promptInput}`;
+
+    // Try Gemini first
+    if (API_KEY) {
+      try {
+        const ai = new GoogleGenAI({ apiKey: API_KEY });
+        const response: GenerateContentResponse = await ai.models.generateContent({
+          model: 'gemini-3-flash-preview',
+          contents: prompt,
+        });
+        setAiResponse(response.text || 'No response from AI.');
+        setIsLoading(false);
+        setPromptInput('');
+        return;
+      } catch (error) {
+        console.error('Gemini API error, trying OpenRouter fallback:', error);
+      }
     }
+
+    // Fallback to OpenRouter with free models
+    if (OPENROUTER_API_KEY) {
+      const freeModels = [
+        'meta-llama/llama-3.3-70b-instruct:free',
+        'google/gemma-3-12b-it:free',
+        'deepseek/deepseek-r1:free',
+        'qwen/qwen3-80b-a3b-instruct:free',
+      ];
+
+      for (const model of freeModels) {
+        try {
+          const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model,
+              messages: [{ role: 'user', content: prompt }],
+            }),
+          });
+          const data = await response.json();
+          if (data.choices && data.choices[0]) {
+            setAiResponse(data.choices[0].message.content || 'No response from AI.');
+            setIsLoading(false);
+            setPromptInput('');
+            return;
+          }
+        } catch (error) {
+          console.error(`OpenRouter ${model} failed, trying next:`, error);
+        }
+      }
+      setAiResponse('Error: Could not get a response from AI. Your IP may be located in a region where AI services are currently unavailable. I\'m working on adding more API providers to improve access. Please try again later.');
+    } else {
+      setAiResponse('Error: Could not get a response from AI. Your IP may be located in a region where Gemini API is not supported, which means you can\'t use the AI chatbot features right now. I\'m working on switching to OpenRouter API to continue the process...');
+    }
+
+    setIsLoading(false);
+    setPromptInput('');
   };
 
   return (
@@ -312,7 +358,7 @@ export default function App() {
         </button>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-6 pb-32">
+      <main className="w-[90%] mx-auto px-6 pb-32">
         
         {/* HERO SECTION */}
         <section id="about" className="min-h-[90vh] flex flex-col justify-center pt-20 relative">
@@ -370,7 +416,7 @@ export default function App() {
                   <img 
                     src={lang.profile.profileImage} 
                     alt={lang.profile.name} 
-                    className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                    className="w-full h-full object-cover grayscale-0 hover:grayscale transition-all duration-500"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/executive/400/600';
                     }}
@@ -495,29 +541,6 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </section>
-
-        {/* PROJECTS SECTION (Bento Grid) */}
-        <section id="projects" className="py-24 border-t border-[var(--card-border)]">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <h2 className="text-4xl font-bold font-display mb-12 text-gradient">{lang.projects.title}</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {lang.projects.items.map((project, index) => (
-                <div key={index} className={`bg-[var(--card)] border border-[var(--card-border)] rounded-2xl p-8 relative group hover:border-[var(--accent)]/50 transition-colors ${index === 0 ? 'md:col-span-2' : ''}`}>
-                  <div className="w-12 h-12 bg-[var(--bg)] rounded-xl flex items-center justify-center mb-6 border border-[var(--card-border)] text-[var(--accent)]">
-                    <Code size={24} />
-                  </div>
-                  <h3 className="text-2xl font-bold font-display mb-3 text-[var(--fg)]">
-                    {project.name}
-                  </h3>
-                  <p className="text-[var(--muted)] leading-relaxed text-sm">
-                    {project.description}
-                  </p>
                 </div>
               ))}
             </div>
