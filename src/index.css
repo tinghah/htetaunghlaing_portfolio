@@ -80,3 +80,31 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Matrix rain glow effect */
+.matrix-glow {
+  filter: drop-shadow(0 0 6px rgba(0, 255, 65, 0.4));
+}
+
+.light .matrix-glow {
+  filter: drop-shadow(0 0 6px rgba(22, 101, 52, 0.4));
+}
+
+/* Nav button hover glow */
+.nav-glow:hover {
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+}
+
+.dark .nav-glow:hover {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+/* Pulse animation for theme button */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
+}
+
+.theme-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}

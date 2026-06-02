@@ -560,7 +560,7 @@ Email: ${lang.profile.contact.emails[0]}`;
       )}
 
       {/* Floating Glass Navigation */}
-      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-6 py-3 flex items-center space-x-1 shadow-2xl border border-white/10 dark:border-white/10 border-gray-200/50">
+      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-2xl px-5 py-3.5 flex items-center space-x-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.4)] border-2 border-white/20 dark:border-white/20 border-gray-300/60 backdrop-blur-xl bg-[var(--card)]/80">
         {[
           { id: 'about', icon: User, label: 'About', color: 'from-pink-500 to-rose-500' },
           { id: 'experience', icon: Briefcase, label: 'Experience', color: 'from-amber-500 to-orange-500' },
@@ -571,24 +571,32 @@ Email: ${lang.profile.contact.emails[0]}`;
           <a
             key={item.id}
             href={`#${item.id}`}
-            className={`relative flex flex-col items-center justify-center px-3 py-2 rounded-full transition-all duration-300 ${
+            className={`relative flex flex-col items-center justify-center px-3.5 py-2.5 rounded-xl transition-all duration-300 font-bold ${
               activeSection === item.id 
-                ? `bg-gradient-to-r ${item.color} text-white shadow-lg scale-105` 
-                : 'text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)]'
+                ? `bg-gradient-to-r ${item.color} text-white shadow-lg scale-110 shadow-black/30` 
+                : 'text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)] hover:shadow-md'
             }`}
             title={item.label}
           >
-            <item.icon size={18} />
-            <span className="text-[9px] mt-0.5 font-semibold hidden md:block">{item.label}</span>
+            <item.icon size={20} strokeWidth={2.5} />
+            <span className="text-[10px] mt-1 font-extrabold hidden md:block">{item.label}</span>
           </a>
         ))}
-        <div className="w-px h-8 bg-gradient-to-b from-transparent via-[var(--card-border)] to-transparent mx-1"></div>
-        <button onClick={toggleLanguage} className="relative flex flex-col items-center justify-center px-3 py-2 rounded-full text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)] transition-all" title="Language">
-          <Languages size={18} />
-          <span className="text-[9px] mt-0.5 font-bold uppercase">{language}</span>
+        <div className="w-px h-10 bg-gradient-to-b from-transparent via-[var(--card-border)] to-transparent mx-1.5"></div>
+        <button 
+          onClick={toggleLanguage} 
+          className="relative flex items-center justify-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-500/30 text-blue-500 dark:text-blue-400 hover:from-blue-500 hover:to-indigo-500 hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-blue-500/30 transition-all font-bold" 
+          title="Language"
+        >
+          <Languages size={20} strokeWidth={2.5} />
+          <span className="text-[11px] ml-1.5 font-extrabold uppercase">{language}</span>
         </button>
-        <button onClick={toggleTheme} className="relative flex flex-col items-center justify-center px-3 py-2 rounded-full text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)] transition-all" title="Theme">
-          {theme === 'dark' ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-indigo-400" />}
+        <button 
+          onClick={toggleTheme} 
+          className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-500 dark:text-amber-400 hover:from-amber-500 hover:to-orange-500 hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-amber-500/30 transition-all" 
+          title="Theme"
+        >
+          {theme === 'dark' ? <Sun size={22} strokeWidth={2.5} className="animate-pulse" /> : <Moon size={22} strokeWidth={2.5} />}
         </button>
       </nav>
 
@@ -645,7 +653,44 @@ Email: ${lang.profile.contact.emails[0]}`;
               </div>
             </div>
 
-            <div className="lg:col-span-4 flex justify-center lg:justify-end">
+            <div className="lg:col-span-4 flex justify-center lg:justify-end relative">
+              {/* Binary Matrix Rain Canvas */}
+              <canvas 
+                ref={(canvas) => {
+                  if (!canvas) return;
+                  const ctx = canvas.getContext('2d');
+                  if (!ctx) return;
+                  canvas.width = 120;
+                  canvas.height = 400;
+                  const chars = '01アイウエオカキクケコサシスセソタチツテト';
+                  const fontSize = 14;
+                  const columns = Math.floor(canvas.width / fontSize);
+                  const drops: number[] = Array(columns).fill(1);
+                  const isDark = document.documentElement.classList.contains('dark');
+                  
+                  const draw = () => {
+                    ctx.fillStyle = isDark ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = isDark ? '#00ff41' : '#166534';
+                    ctx.font = `${fontSize}px monospace`;
+                    
+                    for (let i = 0; i < drops.length; i++) {
+                      const text = chars[Math.floor(Math.random() * chars.length)];
+                      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                      }
+                      drops[i]++;
+                    }
+                  };
+                  
+                  const interval = setInterval(draw, 50);
+                  return () => clearInterval(interval);
+                }}
+                className="absolute -left-16 top-0 opacity-40 pointer-events-none rounded-lg hidden lg:block"
+                style={{ width: 120, height: 400 }}
+              />
+              
               <motion.div 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -653,7 +698,7 @@ Email: ${lang.profile.contact.emails[0]}`;
                 className="relative group cursor-zoom-in"
               >
                 <div className="absolute -inset-1 bg-gradient-to-r from-[var(--accent)] to-emerald-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                <div className="relative w-64 h-80 md:w-72 md:h-96 rounded-2xl overflow-hidden border border-[var(--card-border)] bg-[var(--card)] shadow-2xl">
+                <div className="relative w-64 h-80 md:w-72 md:h-96 rounded-2xl overflow-hidden border-2 border-[var(--accent)]/30 bg-[var(--card)] shadow-2xl">
                   <img 
                     src={lang.profile.profileImage} 
                     alt={lang.profile.name} 
