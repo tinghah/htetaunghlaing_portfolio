@@ -123,14 +123,48 @@ export default function App() {
     setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
     setPromptInput('');
     
-    const prompt = `Based on the following resume profile:
-    Name: ${lang.profile.name}
-    Tagline: ${lang.profile.tagline}
-    Description: ${lang.profile.description.join(' ')}
-    Contact: ${JSON.stringify(lang.profile.contact)}
-    
-    Answer the following question in English:
-    ${userMessage}`;
+    const systemPrompt = `You are Htet Aung Hlaing's (ting) personal AI assistant embedded in his portfolio website. Your ONLY purpose is to represent him professionally.
+
+## STRICT RULES:
+1. ONLY answer questions related to Htet Aung Hlaing's profile, experience, skills, certifications, projects, education, or how he can contribute to a team/company.
+2. If asked about anything unrelated (politics, other people, general knowledge, coding help, etc.), politely decline and redirect: "I'm here to share about Htet Aung Hlaing's professional background. Feel free to ask about his experience, skills, or how he can contribute to your team!"
+3. Always frame answers from a HIRING MANAGER perspective - explain WHY his skills matter, what value he brings, and where he fits best.
+4. Be concise, confident, and professional - like a top recruiter pitching a candidate.
+5. Use bullet points for clarity when listing skills or experience.
+
+## HTET AUNG HLAING'S PROFILE:
+Name: ${lang.profile.name}
+Nickname: ${lang.profile.nickname}
+Title: ${lang.profile.tagline}
+Location: ${lang.profile.contact.address}
+
+## PROFESSIONAL SUMMARY:
+${lang.profile.description.join(' ')}
+
+## WORK EXPERIENCE:
+${lang.experience.items.map(exp => `- ${exp.role} at ${exp.company} (${exp.duration}): ${exp.description.join(' ')}`).join('\n')}
+
+## CORE SKILLS:
+${lang.skills.items.join(', ')}
+
+## CERTIFICATIONS:
+${lang.skills.badges.map(b => `- ${b.name}`).join('\n')}
+
+## KEY PROJECTS:
+${lang.projects?.items?.map(p => `- ${p.name}: ${p.description}`).join('\n') || 'N/A'}
+
+## CONTACT:
+LinkedIn: ${lang.profile.contact.linkedin}
+GitHub: ${lang.profile.contact.github}
+Email: ${lang.profile.contact.emails[0]}
+
+## RESPONSE STYLE:
+- Start with how his experience directly answers the question
+- Highlight specific achievements and metrics when available
+- End with a "fit suggestion" - what role/team/company he'd excel in
+- If uncertain, say "Based on his profile, I can share..." rather than guessing`;
+
+    const prompt = `System: ${systemPrompt}\n\nUser: ${userMessage}`;
 
     console.log('API_KEY set:', !!API_KEY);
     console.log('OPENROUTER_API_KEY set:', !!OPENROUTER_API_KEY);
@@ -147,7 +181,9 @@ export default function App() {
         const ai = new GoogleGenAI({ apiKey: API_KEY });
         const response: GenerateContentResponse = await ai.models.generateContent({
           model: 'gemini-3-flash-preview',
-          contents: prompt,
+          contents: [
+            { role: 'user', parts: [{ text: `System Instructions: ${systemPrompt}\n\nUser Question: ${userMessage}` }] },
+          ],
         });
         const aiMessage = response.text || 'No response from AI.';
         setChatHistory(prev => [...prev, { role: 'ai', content: aiMessage }]);
@@ -181,7 +217,10 @@ export default function App() {
             },
             body: JSON.stringify({
               model,
-              messages: [{ role: 'user', content: prompt }],
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userMessage },
+              ],
             }),
           });
           const data = await response.json();
