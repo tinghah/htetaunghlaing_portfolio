@@ -35,7 +35,7 @@ export default function App() {
   const [aiWarningOpen, setAiWarningOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectedApi, setConnectedApi] = useState<string | null>(null);
-  const [contactClicks, setContactClicks] = useState(0);
+  const [matrixSpeed, setMatrixSpeed] = useState(80);
 
   // Theme effect
   useEffect(() => {
@@ -586,7 +586,7 @@ Email: ${lang.profile.contact.emails[0]}`;
       )}
 
       {/* Floating Glass Navigation */}
-      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-2xl px-5 py-3.5 flex items-center space-x-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.4)] border-2 border-white/20 dark:border-white/20 border-gray-300/60 backdrop-blur-xl bg-[var(--card)]/80">
+      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-2xl px-5 py-3.5 flex items-center space-x-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.4)] dark:border-white dark:border-2 border-gray-300 border-2 backdrop-blur-xl bg-[var(--card)]/80">
         {[
           { id: 'about', icon: User, label: 'About', color: 'from-pink-500 to-rose-500' },
           { id: 'experience', icon: Briefcase, label: 'Experience', color: 'from-amber-500 to-orange-500' },
@@ -690,56 +690,77 @@ Email: ${lang.profile.contact.emails[0]}`;
               </div>
             </div>
 
-            <div className="lg:col-span-4 flex justify-center lg:justify-end relative">
-              {/* Binary Matrix Rain Canvas - Background */}
-              <canvas 
-                ref={(canvas) => {
-                  if (!canvas) return;
-                  const ctx = canvas.getContext('2d');
-                  if (!ctx) return;
-                  canvas.width = 200;
-                  canvas.height = 500;
-                  
-                  // Language-based binary + katakana
-                  const binaryChars: Record<LanguageKey, string> = {
-                    en: '01',
-                    mm: '၀၁',
-                    zh: '零壹〇一',
-                  };
-                  const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-                  const chars = binaryChars[language] + katakana;
-                  const fontSize = 14;
-                  const columns = Math.floor(canvas.width / fontSize);
-                  const drops: number[] = Array(columns).fill(1);
-                  let animFrame: number;
-                  
-                  const isDark = document.documentElement.classList.contains('dark');
-                  
-                  const draw = () => {
-                    ctx.fillStyle = isDark ? 'rgba(5,5,5,0.06)' : 'rgba(255,255,255,0.06)';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = isDark ? '#00ff41' : '#166534';
-                    ctx.font = `${fontSize}px monospace`;
-                    ctx.globalAlpha = 0.7;
+            <div className="lg:col-span-4 flex justify-center lg:justify-end relative" style={{ minHeight: 420 }}>
+              {/* Binary Matrix Rain Canvas - Behind Profile */}
+              <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                <canvas 
+                  ref={(canvas) => {
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) return;
+                    canvas.width = 280;
+                    canvas.height = 500;
                     
-                    for (let i = 0; i < drops.length; i++) {
-                      const text = chars[Math.floor(Math.random() * chars.length)];
-                      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                        drops[i] = 0;
+                    const binaryChars: Record<LanguageKey, string> = {
+                      en: '01',
+                      mm: '၀၁',
+                      zh: '零壹〇一',
+                    };
+                    const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+                    const chars = binaryChars[language] + katakana;
+                    const fontSize = 14;
+                    const columns = Math.floor(canvas.width / fontSize);
+                    const drops: number[] = Array(columns).fill(1);
+                    let animFrame: number;
+                    let lastTime = 0;
+                    const isDark = document.documentElement.classList.contains('dark');
+                    
+                    const draw = (timestamp: number) => {
+                      if (timestamp - lastTime < matrixSpeed) {
+                        animFrame = requestAnimationFrame(draw);
+                        return;
                       }
-                      drops[i]++;
-                    }
-                    ctx.globalAlpha = 1;
+                      lastTime = timestamp;
+                      
+                      ctx.fillStyle = isDark ? 'rgba(5,5,5,0.08)' : 'rgba(255,255,255,0.08)';
+                      ctx.fillRect(0, 0, canvas.width, canvas.height);
+                      ctx.fillStyle = isDark ? '#00ff41' : '#166534';
+                      ctx.font = `${fontSize}px monospace`;
+                      ctx.globalAlpha = 0.6;
+                      
+                      for (let i = 0; i < drops.length; i++) {
+                        const text = chars[Math.floor(Math.random() * chars.length)];
+                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                          drops[i] = 0;
+                        }
+                        drops[i]++;
+                      }
+                      ctx.globalAlpha = 1;
+                      animFrame = requestAnimationFrame(draw);
+                    };
+                    
                     animFrame = requestAnimationFrame(draw);
-                  };
-                  
-                  draw();
-                  return () => cancelAnimationFrame(animFrame);
-                }}
-                className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none rounded-xl"
-                style={{ width: 200, height: 500 }}
-              />
+                    return () => cancelAnimationFrame(animFrame);
+                  }}
+                  className="opacity-40 pointer-events-none"
+                  style={{ width: 280, height: 500 }}
+                />
+              </div>
+
+              {/* Speed Controller */}
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-[var(--card)] border border-[var(--card-border)] rounded-full px-3 py-1.5 shadow-lg">
+                <span className="text-[10px] text-[var(--muted)] font-bold">Matrix</span>
+                <input
+                  type="range"
+                  min="10"
+                  max="200"
+                  value={200 - matrixSpeed}
+                  onChange={(e) => setMatrixSpeed(200 - Number(e.target.value))}
+                  className="w-16 h-1 accent-green-500"
+                />
+                <span className="text-[10px] text-green-500 font-bold">⚡</span>
+              </div>
               
               {/* Profile Image - In Front */}
               <motion.div 
