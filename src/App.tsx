@@ -21,7 +21,6 @@ export default function App() {
     return (savedTheme === 'light' || savedTheme === 'dark') ? savedTheme : 'dark';
   });
   const [promptInput, setPromptInput] = useState('');
-  const [aiResponse, setAiResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [activeSection, setActiveSection] = useState('about');
   const [isImageZoomed, setIsImageZoomed] = useState(false);
@@ -29,8 +28,10 @@ export default function App() {
   const [isWeChatModalOpen, setIsWeChatModalOpen] = useState(false);
   const [showAllRepos, setShowAllRepos] = useState(false);
   const [selectedRepo, setSelectedRepo] = useState<any | null>(null);
-  const [visitorInfo, setVisitorInfo] = useState<{ ip: string; country: string; city: string } | null>(null);
+  const [visitorInfo, setVisitorInfo] = useState<{ ip: string; country: string; city: string; hostname: string; browser: string; os: string } | null>(null);
   const [viewCount, setViewCount] = useState(0);
+  const [recentVisitors, setRecentVisitors] = useState<Array<{ ip: string; country: string; city: string; hostname: string; browser: string; os: string; views: number; lastVisit: string }>>([]);
+  const [chatHistory, setChatHistory] = useState<Array<{ role: 'user' | 'ai'; content: string }>>([]);
 
   // Theme effect
   useEffect(() => {
@@ -74,11 +75,20 @@ export default function App() {
         const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
         const geoData = await geoRes.json();
 
-        setVisitorInfo({
+        const hostname = window.location.hostname || 'local';
+        const browser = navigator.userAgent.split(' ').pop()?.split('(')[0] || 'Unknown';
+        const os = navigator.platform || navigator.userAgentData?.platform || 'Unknown';
+
+        const visitorData = {
           ip,
           country: geoData.country_name || 'Unknown',
           city: geoData.city || 'Unknown',
-        });
+          hostname,
+          browser,
+          os,
+        };
+
+        setVisitorInfo(visitorData);
 
         // Track view count in localStorage
         const visitors = JSON.parse(localStorage.getItem('portfolio_visitors') || '[]');
@@ -88,15 +98,14 @@ export default function App() {
           visitors[existingIndex].lastVisit = new Date().toISOString();
         } else {
           visitors.push({
-            ip,
-            country: geoData.country_name || 'Unknown',
-            city: geoData.city || 'Unknown',
+            ...visitorData,
             views: 1,
             lastVisit: new Date().toISOString(),
           });
         }
         localStorage.setItem('portfolio_visitors', JSON.stringify(visitors));
         setViewCount(visitors.reduce((sum: number, v: any) => sum + v.views, 0));
+        setRecentVisitors(visitors.slice(-5).reverse());
       } catch (error) {
         console.error('Visitor tracking error:', error);
       }
@@ -109,7 +118,10 @@ export default function App() {
   const handlePromptSubmit = async () => {
     if (!promptInput.trim()) return;
     setIsLoading(true);
-    setAiResponse('');
+    
+    const userMessage = promptInput;
+    setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
+    setPromptInput('');
     
     const prompt = `Based on the following resume profile:
     Name: ${lang.profile.name}
@@ -118,19 +130,21 @@ export default function App() {
     Contact: ${JSON.stringify(lang.profile.contact)}
     
     Answer the following question in English:
-    ${promptInput}`;
+    ${userMessage}`;
 
-    // Try Gemini first
-    if (API_KEY) {
+    // Skip Gemini for Myanmar users, go directly to OpenRouter
+    const isMyanmar = visitorInfo?.country === 'Myanmar';
+    
+    if (API_KEY && !isMyanmar) {
       try {
         const ai = new GoogleGenAI({ apiKey: API_KEY });
         const response: GenerateContentResponse = await ai.models.generateContent({
           model: 'gemini-3-flash-preview',
           contents: prompt,
         });
-        setAiResponse(response.text || 'No response from AI.');
+        const aiMessage = response.text || 'No response from AI.';
+        setChatHistory(prev => [...prev, { role: 'ai', content: aiMessage }]);
         setIsLoading(false);
-        setPromptInput('');
         return;
       } catch (error) {
         console.error('Gemini API error, trying OpenRouter fallback:', error);
@@ -153,6 +167,8 @@ export default function App() {
             headers: {
               'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
               'Content-Type': 'application/json',
+              'HTTP-Referer': window.location.origin,
+              'X-Title': 'Portfolio AI Assistant',
             },
             body: JSON.stringify({
               model,
@@ -161,22 +177,21 @@ export default function App() {
           });
           const data = await response.json();
           if (data.choices && data.choices[0]) {
-            setAiResponse(data.choices[0].message.content || 'No response from AI.');
+            const aiMessage = data.choices[0].message.content || 'No response from AI.';
+            setChatHistory(prev => [...prev, { role: 'ai', content: aiMessage }]);
             setIsLoading(false);
-            setPromptInput('');
             return;
           }
         } catch (error) {
           console.error(`OpenRouter ${model} failed, trying next:`, error);
         }
       }
-      setAiResponse('Error: Could not get a response from AI. Your IP may be located in a region where AI services are currently unavailable. I\'m working on adding more API providers to improve access. Please try again later.');
+      setChatHistory(prev => [...prev, { role: 'ai', content: 'Error: All AI models are currently unavailable. Please try again later.' }]);
     } else {
-      setAiResponse('Error: Could not get a response from AI. Your IP may be located in a region where Gemini API is not supported, which means you can\'t use the AI chatbot features right now. I\'m working on switching to OpenRouter API to continue the process...');
+      setChatHistory(prev => [...prev, { role: 'ai', content: 'Error: AI service is not configured. Please contact the administrator.' }]);
     }
 
     setIsLoading(false);
-    setPromptInput('');
   };
 
   return (
@@ -779,17 +794,20 @@ export default function App() {
                 </div>
                 <div className="mx-auto text-xs text-gray-500 font-medium">{lang.prompts.title}</div>
               </div>
-              <div className="p-6 text-sm min-h-[300px] flex flex-col">
+              <div className="p-6 text-sm min-h-[500px] max-h-[700px] flex flex-col">
                 {/* Visitor Info Bar */}
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-4 px-3 py-2 bg-[#111] rounded-lg border border-[#222]">
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1">
                       <Globe size={12} className="text-green-400" />
-                      {visitorInfo ? `${visitorInfo.city}, ${visitorInfo.country}` : 'Detecting location...'}
+                      {visitorInfo ? `${visitorInfo.city}, ${visitorInfo.country}` : 'Detecting...'}
                     </span>
                     <span className="flex items-center gap-1">
                       <User size={12} className="text-blue-400" />
                       {visitorInfo ? visitorInfo.ip : '...'}
+                    </span>
+                    <span className="flex items-center gap-1 text-gray-600">
+                      {visitorInfo?.hostname} • {visitorInfo?.os}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -798,16 +816,50 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Recent Visitors */}
+                {recentVisitors.length > 0 && (
+                  <div className="mb-4 px-3 py-2 bg-[#0d0d0d] rounded-lg border border-[#1a1a1a]">
+                    <div className="text-[10px] text-gray-600 mb-2 uppercase tracking-wider">Recent Visitors</div>
+                    <div className="space-y-1">
+                      {recentVisitors.map((v, i) => (
+                        <div key={i} className="flex items-center justify-between text-[11px] text-gray-500">
+                          <span className="flex items-center gap-2">
+                            <span className="text-green-500/60">{v.city}</span>
+                            <span className="text-gray-600">•</span>
+                            <span>{v.country}</span>
+                            <span className="text-gray-600">•</span>
+                            <span className="text-gray-600">{v.browser}</span>
+                          </span>
+                          <span className="text-gray-600">{new Date(v.lastVisit).toLocaleDateString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="text-gray-400 mb-4">
                   <span className="text-green-400">guest@portfolio</span>:<span className="text-blue-400">~</span>$ {lang.prompts.terminal}
                   <br/>
                   <span className="text-gray-500">{lang.prompts.ready}</span>
                 </div>
                 
-                <div className="flex-grow overflow-y-auto mb-6">
-                  {aiResponse && (
-                    <div className="text-gray-300 leading-relaxed border-l-2 border-green-500 pl-4 py-1">
-                      {aiResponse}
+                {/* Chat History */}
+                <div className="flex-grow overflow-y-auto mb-6 space-y-4">
+                  {chatHistory.map((msg, index) => (
+                    <div key={index} className={`border-l-2 pl-4 py-1 ${msg.role === 'ai' ? 'border-green-500 text-gray-300' : 'border-blue-500 text-gray-400'}`}>
+                      <span className={`text-[10px] uppercase tracking-wider ${msg.role === 'ai' ? 'text-green-500/60' : 'text-blue-500/60'}`}>
+                        {msg.role === 'ai' ? 'AI' : 'You'}
+                      </span>
+                      <div className="mt-1 whitespace-pre-wrap">{msg.content}</div>
+                    </div>
+                  ))}
+                  {isLoading && (
+                    <div className="border-l-2 border-green-500 pl-4 py-1 text-gray-400">
+                      <span className="text-[10px] uppercase tracking-wider text-green-500/60">AI</span>
+                      <div className="mt-1 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        Thinking...
+                      </div>
                     </div>
                   )}
                 </div>
