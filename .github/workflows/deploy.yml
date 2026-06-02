@@ -21,8 +21,11 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - name: Install dependencies
-        run: npm install
+      - name: Clear cache and install
+        run: |
+          rm -rf node_modules
+          rm -rf dist
+          npm install
       - name: Build
         run: npm run build
         env:
