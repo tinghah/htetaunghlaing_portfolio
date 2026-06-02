@@ -6,6 +6,10 @@ Welcome to the source code for my professional portfolio website! I am an IT Sys
 
 This project is built using modern web technologies to ensure high performance, maintainability, and an excellent user experience.
 
+## 🌐 Live Site
+
+Preview the live site at [tinghah.github.io](https://tinghah.github.io)
+
 ## 🚀 Tech Stack
 
 - **Framework:** React + Vite
