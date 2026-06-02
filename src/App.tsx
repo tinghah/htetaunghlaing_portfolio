@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { LANGUAGES } from './constants';
-import { Github, Linkedin, Download, Mail, Phone, MapPin, Sun, Moon, Terminal, Briefcase, Code, User, Cpu, ArrowRight, Award, FileText, Send, MessageCircle, ExternalLink, Languages, Star, Lock, Globe, X } from 'lucide-react';
+import { Github, Linkedin, Download, Mail, Phone, MapPin, Sun, Moon, Terminal, Briefcase, Code, User, Cpu, ArrowRight, Award, FileText, Send, MessageCircle, ExternalLink, Languages, Star, Lock, Globe, X, Eye } from 'lucide-react';
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
 import { LanguageKey } from './constants';
 import reposData from './repos.json';
@@ -29,6 +29,8 @@ export default function App() {
   const [isWeChatModalOpen, setIsWeChatModalOpen] = useState(false);
   const [showAllRepos, setShowAllRepos] = useState(false);
   const [selectedRepo, setSelectedRepo] = useState<any | null>(null);
+  const [visitorInfo, setVisitorInfo] = useState<{ ip: string; country: string; city: string } | null>(null);
+  const [viewCount, setViewCount] = useState(0);
 
   // Theme effect
   useEffect(() => {
@@ -59,6 +61,47 @@ export default function App() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Visitor tracking
+  useEffect(() => {
+    const trackVisitor = async () => {
+      try {
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipRes.json();
+        const ip = ipData.ip;
+
+        const geoRes = await fetch(`https://ipapi.co/${ip}/json/`);
+        const geoData = await geoRes.json();
+
+        setVisitorInfo({
+          ip,
+          country: geoData.country_name || 'Unknown',
+          city: geoData.city || 'Unknown',
+        });
+
+        // Track view count in localStorage
+        const visitors = JSON.parse(localStorage.getItem('portfolio_visitors') || '[]');
+        const existingIndex = visitors.findIndex((v: any) => v.ip === ip);
+        if (existingIndex >= 0) {
+          visitors[existingIndex].views += 1;
+          visitors[existingIndex].lastVisit = new Date().toISOString();
+        } else {
+          visitors.push({
+            ip,
+            country: geoData.country_name || 'Unknown',
+            city: geoData.city || 'Unknown',
+            views: 1,
+            lastVisit: new Date().toISOString(),
+          });
+        }
+        localStorage.setItem('portfolio_visitors', JSON.stringify(visitors));
+        setViewCount(visitors.reduce((sum: number, v: any) => sum + v.views, 0));
+      } catch (error) {
+        console.error('Visitor tracking error:', error);
+      }
+    };
+    trackVisitor();
   }, []);
 
   const toggleTheme = () => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
@@ -737,6 +780,24 @@ export default function App() {
                 <div className="mx-auto text-xs text-gray-500 font-medium">{lang.prompts.title}</div>
               </div>
               <div className="p-6 text-sm min-h-[300px] flex flex-col">
+                {/* Visitor Info Bar */}
+                <div className="flex items-center justify-between text-xs text-gray-500 mb-4 px-3 py-2 bg-[#111] rounded-lg border border-[#222]">
+                  <div className="flex items-center gap-4">
+                    <span className="flex items-center gap-1">
+                      <Globe size={12} className="text-green-400" />
+                      {visitorInfo ? `${visitorInfo.city}, ${visitorInfo.country}` : 'Detecting location...'}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <User size={12} className="text-blue-400" />
+                      {visitorInfo ? visitorInfo.ip : '...'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Eye size={12} className="text-yellow-400" />
+                    <span>{viewCount} views</span>
+                  </div>
+                </div>
+
                 <div className="text-gray-400 mb-4">
                   <span className="text-green-400">guest@portfolio</span>:<span className="text-blue-400">~</span>$ {lang.prompts.terminal}
                   <br/>
