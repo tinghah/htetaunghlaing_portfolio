@@ -132,6 +132,9 @@ export default function App() {
     Answer the following question in English:
     ${userMessage}`;
 
+    console.log('API_KEY set:', !!API_KEY);
+    console.log('OPENROUTER_API_KEY set:', !!OPENROUTER_API_KEY);
+
     // Skip Gemini for Myanmar users, go directly to OpenRouter
     const isMyanmar = visitorInfo?.country === 'Myanmar';
     
@@ -161,6 +164,7 @@ export default function App() {
       ];
 
       for (const model of freeModels) {
+        setChatHistory(prev => [...prev, { role: 'ai', content: `Trying model: ${model}...` }]);
         try {
           const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
@@ -176,14 +180,34 @@ export default function App() {
             }),
           });
           const data = await response.json();
+          
+          if (data.error) {
+            console.error(`OpenRouter ${model} error:`, data.error);
+            setChatHistory(prev => {
+              const updated = [...prev];
+              updated[updated.length - 1] = { role: 'ai', content: `Model ${model} failed: ${data.error.message || 'Unknown error'}` };
+              return updated;
+            });
+            continue;
+          }
+          
           if (data.choices && data.choices[0]) {
             const aiMessage = data.choices[0].message.content || 'No response from AI.';
-            setChatHistory(prev => [...prev, { role: 'ai', content: aiMessage }]);
+            setChatHistory(prev => {
+              const updated = [...prev];
+              updated[updated.length - 1] = { role: 'ai', content: `[${model}] ${aiMessage}` };
+              return updated;
+            });
             setIsLoading(false);
             return;
           }
         } catch (error) {
           console.error(`OpenRouter ${model} failed, trying next:`, error);
+          setChatHistory(prev => {
+            const updated = [...prev];
+            updated[updated.length - 1] = { role: 'ai', content: `Model ${model} connection failed` };
+            return updated;
+          });
         }
       }
       setChatHistory(prev => [...prev, { role: 'ai', content: 'Error: All AI models are currently unavailable. Please try again later.' }]);
