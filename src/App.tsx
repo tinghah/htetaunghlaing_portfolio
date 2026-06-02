@@ -157,10 +157,11 @@ export default function App() {
     // Fallback to OpenRouter with free models
     if (OPENROUTER_API_KEY) {
       const freeModels = [
-        'meta-llama/llama-3.3-70b-instruct:free',
-        'google/gemma-3-12b-it:free',
-        'deepseek/deepseek-r1:free',
-        'qwen/qwen3-80b-a3b-instruct:free',
+        'openrouter/free',
+        'nvidia/nemotron-3-super:free',
+        'google/gemma-4-31b:free',
+        'moonshotai/kimi-k2.6:free',
+        'nvidia/nemotron-3-nano-30b-a3b:free',
       ];
 
       for (const model of freeModels) {
