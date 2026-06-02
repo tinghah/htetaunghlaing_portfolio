@@ -137,6 +137,10 @@ export default function App() {
 
     // Skip Gemini for Myanmar users, go directly to OpenRouter
     const isMyanmar = visitorInfo?.country === 'Myanmar';
+
+    // Show API status for debugging
+    const apiStatus = `API Status: Gemini=${API_KEY ? 'OK' : 'NO_KEY'} | OpenRouter=${OPENROUTER_API_KEY ? 'OK' : 'NO_KEY'} | Region=${visitorInfo?.country || 'Unknown'}`;
+    console.log(apiStatus);
     
     if (API_KEY && !isMyanmar) {
       try {
@@ -213,7 +217,7 @@ export default function App() {
       }
       setChatHistory(prev => [...prev, { role: 'ai', content: 'Error: All AI models are currently unavailable. Please try again later.' }]);
     } else {
-      setChatHistory(prev => [...prev, { role: 'ai', content: 'Error: AI service is not configured. Please contact the administrator.' }]);
+      setChatHistory(prev => [...prev, { role: 'ai', content: 'Error: OPENROUTER_API_KEY is not configured. The site owner needs to add this secret in GitHub repository settings for the AI chatbot to work.' }]);
     }
 
     setIsLoading(false);
