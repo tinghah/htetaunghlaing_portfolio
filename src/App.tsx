@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { LANGUAGES } from './constants';
-import { Github, Linkedin, Download, Mail, Phone, MapPin, Sun, Moon, Terminal, Briefcase, Code, User, Cpu, ArrowRight, Award, FileText, Send, MessageCircle, ExternalLink, Languages, Star, Lock, Globe, X, Eye } from 'lucide-react';
+import { Github, Linkedin, Download, Mail, Phone, MapPin, Sun, Moon, Terminal, Briefcase, Code, User, Cpu, ArrowRight, Award, FileText, Send, MessageCircle, ExternalLink, Languages, Star, Lock, Globe, X, Eye, Bot, AlertTriangle, Wifi, CheckCircle } from 'lucide-react';
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
 import { LanguageKey } from './constants';
 import reposData from './repos.json';
@@ -32,9 +32,10 @@ export default function App() {
   const [viewCount, setViewCount] = useState(0);
   const [recentVisitors, setRecentVisitors] = useState<Array<{ ip: string; country: string; city: string; hostname: string; browser: string; os: string; views: number; lastVisit: string }>>([]);
   const [chatHistory, setChatHistory] = useState<Array<{ role: 'user' | 'ai'; content: string }>>([]);
-  const [helpDeskOpen, setHelpDeskOpen] = useState(false);
-  const [helpDeskInput, setHelpDeskInput] = useState('');
-  const [helpDeskHistory, setHelpDeskHistory] = useState<Array<{ role: 'user' | 'bot'; content: string }>>([]);
+  const [aiWarningOpen, setAiWarningOpen] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [connectedApi, setConnectedApi] = useState<string | null>(null);
+  const [contactClicks, setContactClicks] = useState(0);
 
   // Theme effect
   useEffect(() => {
@@ -121,6 +122,8 @@ export default function App() {
   const handlePromptSubmit = async () => {
     if (!promptInput.trim()) return;
     setIsLoading(true);
+    setIsConnecting(true);
+    setConnectedApi(null);
     
     const userMessage = promptInput;
     setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
@@ -132,22 +135,24 @@ export default function App() {
       zh: 'Chinese (Simplified)',
     };
 
+    // Myanmar users can only use English or Chinese
+    const isMyanmar = visitorInfo?.country === 'Myanmar';
+    const effectiveLanguage = isMyanmar ? (language === 'mm' ? 'en' : language) : language;
+
     const systemPrompt = `You are Htet Aung Hlaing's (ting) personal AI assistant embedded in his portfolio website. Your ONLY purpose is to represent him professionally.
 
 ## CRITICAL LANGUAGE RULE:
-You MUST respond in ${languageMap[language]} language. The website is currently set to ${languageMap[language]}. Match the user's input language: if they ask in Myanmar, respond in Myanmar. If Chinese, respond in Chinese. If English, respond in English. ALWAYS use ${languageMap[language]} as the primary response language.
+You MUST respond in ${languageMap[effectiveLanguage]} language. ALWAYS use ${languageMap[effectiveLanguage]} as the primary response language.
 
 ## STRICT RULES:
 1. ONLY answer questions related to Htet Aung Hlaing's profile, experience, skills, certifications, projects, education, or how he can contribute to a team/company.
-2. If asked about anything unrelated (politics, other people, general knowledge, coding help, etc.), politely decline and redirect in ${languageMap[language]}: "I'm here to share about Htet Aung Hlaing's professional background. Feel free to ask about his experience, skills, or how he can contribute to your team!"
-3. Always frame answers from a HIRING MANAGER perspective - explain WHY his skills matter, what value he brings, and where he fits best.
-4. Be concise, confident, and professional - like a top recruiter pitching a candidate.
-5. Use bullet points for clarity when listing skills or experience.
-6. If someone asks about this website, mention it's built with React + Vite + Tailwind CSS and the source code is at https://github.com/tinghah/tinghah.github.io
+2. If asked about anything unrelated, politely decline and redirect.
+3. Always frame answers from a HIRING MANAGER perspective.
+4. Be concise, confident, and professional.
+5. If someone asks about this website, mention it's built with React + Vite + Tailwind CSS and the source code is at https://github.com/tinghah/tinghah.github.io
 
 ## HTET AUNG HLAING'S PROFILE:
-Name: ${lang.profile.name}
-Nickname: ${lang.profile.nickname}
+Name: ${lang.profile.name} (${lang.profile.nickname})
 Title: ${lang.profile.tagline}
 Location: ${lang.profile.contact.address}
 
@@ -163,33 +168,24 @@ ${lang.skills.items.join(', ')}
 ## CERTIFICATIONS:
 ${lang.skills.badges.map(b => `- ${b.name}`).join('\n')}
 
-## KEY PROJECTS:
-${lang.projects?.items?.map(p => `- ${p.name}: ${p.description}`).join('\n') || 'N/A'}
-
 ## CONTACT:
 LinkedIn: ${lang.profile.contact.linkedin}
 GitHub: ${lang.profile.contact.github}
-Email: ${lang.profile.contact.emails[0]}
+Email: ${lang.profile.contact.emails[0]}`;
 
-## RESPONSE STYLE:
-- Start with how his experience directly answers the question
-- Highlight specific achievements and metrics when available
-- End with a "fit suggestion" - what role/team/company he'd excel in
-- If uncertain, say "Based on his profile, I can share..." rather than guessing`;
-
-    const prompt = `System: ${systemPrompt}\n\nUser: ${userMessage}`;
-
-    console.log('API_KEY set:', !!API_KEY);
-    console.log('OPENROUTER_API_KEY set:', !!OPENROUTER_API_KEY);
-
-    // Skip Gemini for Myanmar users, go directly to OpenRouter
-    const isMyanmar = visitorInfo?.country === 'Myanmar';
-
-    // Show API status for debugging
-    const apiStatus = `API Status: Gemini=${API_KEY ? 'OK' : 'NO_KEY'} | OpenRouter=${OPENROUTER_API_KEY ? 'OK' : 'NO_KEY'} | Region=${visitorInfo?.country || 'Unknown'}`;
-    console.log(apiStatus);
+    // Connection animation
+    await new Promise(r => setTimeout(r, 800));
+    setChatHistory(prev => [...prev, { role: 'ai', content: '⏳ Initializing AI context...' }]);
+    await new Promise(r => setTimeout(r, 600));
     
     if (API_KEY && !isMyanmar) {
+      setChatHistory(prev => {
+        const updated = [...prev];
+        updated[updated.length - 1] = { role: 'ai', content: '🔗 Connecting to Google Gemini API...' };
+        return updated;
+      });
+      await new Promise(r => setTimeout(r, 700));
+      
       try {
         const ai = new GoogleGenAI({ apiKey: API_KEY });
         const response: GenerateContentResponse = await ai.models.generateContent({
@@ -199,27 +195,50 @@ Email: ${lang.profile.contact.emails[0]}
           ],
         });
         const aiMessage = response.text || 'No response from AI.';
-        setChatHistory(prev => [...prev, { role: 'ai', content: aiMessage }]);
+        setConnectedApi('Google Gemini');
+        setChatHistory(prev => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { role: 'ai', content: `✅ Connected to Google Gemini\n\n${aiMessage}` };
+          return updated;
+        });
         setIsLoading(false);
+        setIsConnecting(false);
         return;
       } catch (error) {
         console.error('Gemini API error, trying OpenRouter fallback:', error);
+        setChatHistory(prev => {
+          const updated = [...prev];
+          updated[updated.length - 1] = { role: 'ai', content: '⚠️ Gemini unavailable, switching to OpenRouter...' };
+          return updated;
+        });
+        await new Promise(r => setTimeout(r, 500));
       }
     }
 
-    // Fallback to OpenRouter with free models
+    // Fallback to OpenRouter
     if (OPENROUTER_API_KEY) {
+      setChatHistory(prev => {
+        const updated = [...prev];
+        updated[updated.length - 1] = { role: 'ai', content: '🔗 Connecting to OpenRouter API...' };
+        return updated;
+      });
+      await new Promise(r => setTimeout(r, 600));
+      
       const freeModels = [
         'openrouter/free',
         'nvidia/nemotron-3-super:free',
         'google/gemma-4-31b:free',
         'moonshotai/kimi-k2.6:free',
-        'nvidia/nemotron-3-nano-30b-a3b:free',
       ];
 
       for (const model of freeModels) {
-        setChatHistory(prev => [...prev, { role: 'ai', content: `Trying model: ${model}...` }]);
         try {
+          setChatHistory(prev => {
+            const updated = [...prev];
+            updated[updated.length - 1] = { role: 'ai', content: `🔗 Trying ${model}...` };
+            return updated;
+          });
+          
           const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -240,94 +259,32 @@ Email: ${lang.profile.contact.emails[0]}
           
           if (data.error) {
             console.error(`OpenRouter ${model} error:`, data.error);
-            setChatHistory(prev => {
-              const updated = [...prev];
-              updated[updated.length - 1] = { role: 'ai', content: `Model ${model} failed: ${data.error.message || 'Unknown error'}` };
-              return updated;
-            });
             continue;
           }
           
           if (data.choices && data.choices[0]) {
             const aiMessage = data.choices[0].message.content || 'No response from AI.';
+            setConnectedApi(model);
             setChatHistory(prev => {
               const updated = [...prev];
-              updated[updated.length - 1] = { role: 'ai', content: `[${model}] ${aiMessage}` };
+              updated[updated.length - 1] = { role: 'ai', content: `✅ Connected to ${model}\n\n${aiMessage}` };
               return updated;
             });
             setIsLoading(false);
+            setIsConnecting(false);
             return;
           }
         } catch (error) {
-          console.error(`OpenRouter ${model} failed, trying next:`, error);
-          setChatHistory(prev => {
-            const updated = [...prev];
-            updated[updated.length - 1] = { role: 'ai', content: `Model ${model} connection failed` };
-            return updated;
-          });
+          console.error(`OpenRouter ${model} failed:`, error);
         }
       }
-      setChatHistory(prev => [...prev, { role: 'ai', content: 'Error: All AI models are currently unavailable. Please try again later.' }]);
+      setChatHistory(prev => [...prev, { role: 'ai', content: '❌ All AI models are currently unavailable. Please try again later.' }]);
     } else {
-      setChatHistory(prev => [...prev, { role: 'ai', content: 'Error: OPENROUTER_API_KEY is not configured. The site owner needs to add this secret in GitHub repository settings for the AI chatbot to work.' }]);
+      setChatHistory(prev => [...prev, { role: 'ai', content: '❌ AI service is not configured. Please contact the administrator.' }]);
     }
 
     setIsLoading(false);
-  };
-
-  // Help Desk Auto-Reply
-  const helpDeskReplies: Record<string, { en: string; mm: string; zh: string }> = {
-    greeting: {
-      en: "Hello! Welcome to Htet Aung Hlaing's portfolio. I'm here to help you learn about his experience and skills. What would you like to know?",
-      mm: "မင်္ဂလာပါ! Htet Aung Hlaing ၏ portfolio သို့ ကြိုဆိုပါသည်။ သူ၏ အတွေ့အကြုံနှင့် ကျွမ်းကျင်မှုများအကြောင်း သင့်အား ကူညီပေးလိုပါသည်။ ဘာသိချင်လဲ?",
-      zh: "你好！欢迎来到 Htet Aung Hlaing 的作品集。我在这里帮助您了解他的经验和技能。您想了解什么？"
-    },
-    experience: {
-      en: "Htet has 4+ years of IT experience spanning SAP MES/WMS integration, network infrastructure, and AI solutions. His most recent role is IT Project Coordinator at Pouchen Myanmar Adidas (PMA). Want to know about specific skills?",
-      mm: "Htet တွင် SAP MES/WMS ပေါင်းစပ်မှု၊ ကွန်ယက်အခြေခံအဆောက်အအုံနှင့် AI ဖြေရှင်းချက်များအပါအဝင် IT အတွေ့အကြုံ ၄+ နှစ်ရှိသည်။ အဓိက ကျွမ်းကျင်မှုများအကြောင်း သိချင်လား?",
-      zh: "Htet 拥有 4 年以上 IT 经验，涵盖 SAP MES/WMS 集成、网络基础设施和 AI 解决方案。他最近的职位是 Pouchen Myanmar Adidas (PMA) 的 IT 项目协调员。想了解具体技能吗？"
-    },
-    skills: {
-      en: "Core skills: SAP MES/WMS Integration, Enterprise IT Architecture, Data Analytics (Power BI, SQL, Python), AI Tool Integration, Project Management, Network Security. He also holds 9+ certifications including Google IT Support and Fortinet Cybersecurity.",
-      mm: "အဓိက ကျွမ်းကျင်မှုများ - SAP MES/WMS ပေါင်းစပ်မှု၊ လုပ်ငန်းသုံး IT ဗိသုကာပညာ၊ ဒေတာခွဲခြမ်းစိတ်ဖြာမှု၊ AI ကိရိယာပေါင်းစပ်မှု၊ စီမံခန့်ခွဲမှု။ Google IT Support နှင့် Fortinet Cybersecurity အပါအဝင် ใပေါင်း ၉+ အသိအမှတ်ပြုလက်မှတ်များ ရှိသည်။",
-      zh: "核心技能：SAP MES/WMS 集成、企业 IT 架构、数据分析（Power BI, SQL, Python）、AI 工具集成、项目管理、网络安全。他还拥有 9 项以上认证，包括 Google IT Support 和 Fortinet Cybersecurity。"
-    },
-    contact: {
-      en: "You can reach Htet via:\n- LinkedIn: linkedin.com/in/tinghah\n- Email: ting.pouchen@gmail.com\n- Telegram: @ting_hah\n- GitHub: github.com/tinghah\n\nHe's based in Yangon, Myanmar and open to opportunities!",
-      mm: "Htet ကို ဆက်သွယ်နိုင်ပါသည် -\n- LinkedIn: linkedin.com/in/tinghah\n- Email: ting.pouchen@gmail.com\n- Telegram: @ting_hah\n- GitHub: github.com/tinghah\n\nရန်ကုန်၊ မြန်မာတွင် အခြေစိုက်ပြီး အခွင့်အလမ်းများအတွက် ဖွင့်လင့်ထားသည်!",
-      zh: "您可以通过以下方式联系 Htet：\n- LinkedIn: linkedin.com/in/tinghah\n- Email: ting.pouchen@gmail.com\n- Telegram: @ting_hah\n- GitHub: github.com/tinghah\n\n他位于缅甸仰光，欢迎各种机会！"
-    },
-    website: {
-      en: "This portfolio website is built with React + Vite + Tailwind CSS, featuring AI chat integration and multi-language support. Source code: https://github.com/tinghah/tinghah.github.io",
-      mm: "ဤ portfolio ဝဘ်ဆိုက်ကို React + Vite + Tailwind CSS ဖြင့် တည်ဆောက်ထားပြီး AI chat ပေါင်းစပ်မှုနှင့် ဘာသာစကားများစွာ ပံ့ပိုးမှု ပါဝင်သည်။ Source code: https://github.com/tinghah/tinghah.github.io",
-      zh: "这个作品集网站使用 React + Vite + Tailwind CSS 构建，具有 AI 聊天集成和多语言支持。源代码：https://github.com/tinghah/tinghah.github.io"
-    },
-    fallback: {
-      en: "I can help you learn about Htet's experience, skills, certifications, or how to contact him. You can also ask about this website. What interests you?",
-      mm: "Htet ၏ အတွေ့အကြုံ၊ ကျွမ်းကျင်မှု၊ အသိအမှတ်ပြုလက်မှတ်များ သို့မဟုတ် ဆက်သွယ်ပုံအကြောင်း သင့်အား ကူညီပေးနိုင်ပါသည်။ ဘာကို စိတ်ဝင်စားလဲ?",
-      zh: "我可以帮助您了解 Htet 的经验、技能、认证或联系方式。您也可以询问有关此网站的问题。您对什么感兴趣？"
-    },
-  };
-
-  const getHelpDeskReply = (input: string): string => {
-    const lower = input.toLowerCase();
-    if (lower.match(/\b(hi|hello|hey|greetings|မင်္ဂလာ|你好)\b/)) return helpDeskReplies.greeting[language];
-    if (lower.match(/\b(experience|work|job|career|role|position|အလုပ်|经验|工作)\b/)) return helpDeskReplies.experience[language];
-    if (lower.match(/\b(skills?| abilities|competenc|ကျွမ်းကျင်|技能|能力)\b/)) return helpDeskReplies.skills[language];
-    if (lower.match(/\b(contact|reach|email|phone|linkedin|telegram|ဆက်သွယ်|联系|邮箱)\b/)) return helpDeskReplies.contact[language];
-    if (lower.match(/\b(website|site|portfolio|git|repo|built|code|ဝဘ်|网站|源码)\b/)) return helpDeskReplies.website[language];
-    return helpDeskReplies.fallback[language];
-  };
-
-  const handleHelpDeskSubmit = () => {
-    if (!helpDeskInput.trim()) return;
-    const userMsg = helpDeskInput;
-    setHelpDeskHistory(prev => [...prev, { role: 'user', content: userMsg }]);
-    setHelpDeskInput('');
-    setTimeout(() => {
-      const reply = getHelpDeskReply(userMsg);
-      setHelpDeskHistory(prev => [...prev, { role: 'bot', content: reply }]);
-    }, 500);
+    setIsConnecting(false);
   };
 
   return (
@@ -436,6 +393,87 @@ Email: ${lang.profile.contact.emails[0]}
                 </div>
                 <p className="mt-4 text-[var(--muted)] text-[10px] uppercase tracking-widest font-bold">霆 | ting</p>
               </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* AI Warning Popup */}
+      {aiWarningOpen && (
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md"
+          onClick={() => setAiWarningOpen(false)}
+        >
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            className="relative max-w-lg w-full bg-[var(--card)] rounded-2xl border border-[var(--card-border)] shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Bot size={28} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">AI Executive Assistant</h3>
+                  <p className="text-white/80 text-sm">Powered by Google Gemini & OpenRouter</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle size={18} className="text-green-400 mt-0.5 shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-[var(--fg)] text-sm">What I can do:</h4>
+                  <p className="text-[var(--muted)] text-xs mt-1">Answer questions about Htet's experience, skills, certifications, projects, and how he can contribute to your team.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <AlertTriangle size={18} className="text-amber-400 mt-0.5 shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-[var(--fg)] text-sm">I cannot help with:</h4>
+                  <p className="text-[var(--muted)] text-xs mt-1">Unrelated topics, other people, general knowledge, coding help, or anything outside Htet's professional profile.</p>
+                </div>
+              </div>
+
+              {visitorInfo?.country === 'Myanmar' && (
+                <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
+                  <AlertTriangle size={18} className="text-amber-400 mt-0.5 shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-amber-400 text-sm">Myanmar Users Notice</h4>
+                    <p className="text-[var(--muted)] text-xs mt-1">Google Gemini API has limited support in Myanmar. You can interact in <strong className="text-[var(--fg)]">English</strong> or <strong className="text-[var(--fg)]">Chinese</strong> only. For Burmese language support, please use a VPN.</p>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-start gap-3">
+                <Wifi size={18} className="text-blue-400 mt-0.5 shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-[var(--fg)] text-sm">How to use:</h4>
+                  <p className="text-[var(--muted)] text-xs mt-1">Ask about Htet's SAP experience, tech stack, certifications, or why he's a great fit for your team. Click below to start chatting!</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t border-[var(--card-border)] bg-[var(--bg)] flex gap-3">
+              <button 
+                onClick={() => setAiWarningOpen(false)}
+                className="flex-1 px-4 py-2 border border-[var(--card-border)] rounded-lg text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)] transition-colors text-sm"
+              >
+                Maybe Later
+              </button>
+              <a 
+                href="#ai"
+                onClick={() => setAiWarningOpen(false)}
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-medium text-center text-sm hover:shadow-lg hover:shadow-green-500/30 transition-all"
+              >
+                Start Chatting
+              </a>
             </div>
           </motion.div>
         </motion.div>
@@ -594,6 +632,13 @@ Email: ${lang.profile.contact.emails[0]}
                 <a href="#experience" className="px-6 py-3 bg-[var(--fg)] text-[var(--bg)] rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center">
                   View Experience <ArrowRight size={16} className="ml-2" />
                 </a>
+                <button 
+                  onClick={() => setAiWarningOpen(true)}
+                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-green-500/30 transition-all flex items-center"
+                >
+                  <Bot size={16} className="mr-2" /> 
+                  {language === 'mm' ? 'AI လက်ထောက်ကို မေးပါ' : language === 'zh' ? '詢問人工智慧助手' : 'Ask AI Assistant'}
+                </button>
                 <a href={lang.resume.file} download className="px-6 py-3 border border-[var(--card-border)] rounded-lg font-medium hover:bg-[var(--card)] transition-colors flex items-center">
                   <Download size={16} className="mr-2" /> {lang.resume.download}
                 </a>
@@ -920,105 +965,172 @@ Email: ${lang.profile.contact.emails[0]}
           </motion.div>
         </section>
 
-        {/* AI INSIGHTS SECTION (Terminal Style) */}
+        {/* AI INSIGHTS SECTION */}
         <section id="ai" className="py-24 border-t border-[var(--card-border)]">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <div className="bg-[#0a0a0a] border border-[#222] rounded-2xl overflow-hidden shadow-2xl font-mono">
-              <div className="bg-[#111] border-b border-[#222] px-4 py-3 flex items-center">
-                <div className="flex space-x-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                </div>
-                <div className="mx-auto text-xs text-gray-500 font-medium">{lang.prompts.title}</div>
-              </div>
-              <div className="p-6 text-sm min-h-[500px] max-h-[700px] flex flex-col">
-                {/* Visitor Info Bar */}
-                <div className="flex items-center justify-between text-xs text-gray-500 mb-4 px-3 py-2 bg-[#111] rounded-lg border border-[#222]">
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1">
-                      <Globe size={12} className="text-green-400" />
-                      {visitorInfo ? `${visitorInfo.city}, ${visitorInfo.country}` : 'Detecting...'}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <User size={12} className="text-blue-400" />
-                      {visitorInfo ? visitorInfo.ip : '...'}
-                    </span>
-                    <span className="flex items-center gap-1 text-gray-600">
-                      {visitorInfo?.hostname} • {visitorInfo?.os}
-                    </span>
+            
+            {/* Welcome + Visitor Info (Outside Terminal) */}
+            <div className="mb-6 space-y-4">
+              {/* Welcome Box */}
+              <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-6">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/20">
+                    <Bot size={28} className="text-white" />
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Eye size={12} className="text-yellow-400" />
-                    <span>{viewCount} views</span>
+                  <div>
+                    <h3 className="text-xl font-bold text-[var(--fg)]">AI Executive Assistant</h3>
+                    <p className="text-[var(--muted)] text-sm">Ask about Htet's experience, skills, or why he fits your team</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {['SAP Experience', 'Tech Stack', 'Certifications', 'Contact Info'].map(q => (
+                    <button
+                      key={q}
+                      onClick={() => { setPromptInput(q); document.getElementById('ai')?.scrollIntoView({ behavior: 'smooth' }); }}
+                      className="px-3 py-1.5 bg-[var(--card)] border border-[var(--card-border)] rounded-full text-xs text-[var(--muted)] hover:text-[var(--fg)] hover:border-green-500 transition-colors"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Visitor Stats Bar */}
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* View Count - Large */}
+                <div className="flex-1 bg-[var(--card)] border border-[var(--card-border)] rounded-2xl p-6 text-center">
+                  <div className="text-4xl font-bold text-[var(--fg)] font-display">{viewCount}</div>
+                  <div className="text-[var(--muted)] text-sm mt-1">Profile Views</div>
+                  <div className="text-[var(--muted)] text-xs mt-2">
+                    {contactClicks > 0 && <span className="text-green-400">{contactClicks} connected</span>}
+                  </div>
+                </div>
+                
+                {/* Visitor Info */}
+                <div className="flex-1 bg-[var(--card)] border border-[var(--card-border)] rounded-2xl p-6">
+                  <div className="text-xs text-[var(--muted)] uppercase tracking-wider mb-3 font-bold">Your Info</div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Globe size={14} className="text-green-400" />
+                      <span className="text-[var(--fg)]">{visitorInfo ? `${visitorInfo.city}, ${visitorInfo.country}` : 'Detecting...'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Wifi size={14} className="text-blue-400" />
+                      <span className="text-[var(--fg)] font-mono text-xs">{visitorInfo?.ip || '...'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <User size={14} className="text-purple-400" />
+                      <span className="text-[var(--muted)] text-xs">{visitorInfo?.hostname} • {visitorInfo?.browser}</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Recent Visitors */}
                 {recentVisitors.length > 0 && (
-                  <div className="mb-4 px-3 py-2 bg-[#0d0d0d] rounded-lg border border-[#1a1a1a]">
-                    <div className="text-[10px] text-gray-600 mb-2 uppercase tracking-wider">Recent Visitors</div>
-                    <div className="space-y-1">
-                      {recentVisitors.map((v, i) => (
-                        <div key={i} className="flex items-center justify-between text-[11px] text-gray-500">
-                          <span className="flex items-center gap-2">
-                            <span className="text-green-500/60">{v.city}</span>
-                            <span className="text-gray-600">•</span>
-                            <span>{v.country}</span>
-                            <span className="text-gray-600">•</span>
-                            <span className="text-gray-600">{v.browser}</span>
+                  <div className="flex-1 bg-[var(--card)] border border-[var(--card-border)] rounded-2xl p-6">
+                    <div className="text-xs text-[var(--muted)] uppercase tracking-wider mb-3 font-bold">Recent Visitors</div>
+                    <div className="space-y-2">
+                      {recentVisitors.slice(0, 4).map((v, i) => (
+                        <div key={i} className="flex items-center justify-between text-xs">
+                          <span className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                            <span className="text-[var(--fg)]">{v.city}</span>
+                            <span className="text-[var(--muted)]">•</span>
+                            <span className="text-[var(--muted)]">{v.country}</span>
                           </span>
-                          <span className="text-gray-600">{new Date(v.lastVisit).toLocaleDateString()}</span>
+                          <span className="text-[var(--muted)] text-[10px]">{new Date(v.lastVisit).toLocaleDateString()}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
 
-                <div className="text-gray-400 mb-4">
-                  <span className="text-green-400">guest@portfolio</span>:<span className="text-blue-400">~</span>$ {lang.prompts.terminal}
-                  <br/>
-                  <span className="text-gray-500">{lang.prompts.ready}</span>
+            {/* Mac Terminal */}
+            <div className="bg-[#1e1e1e] rounded-2xl overflow-hidden shadow-2xl font-mono border border-[#333]">
+              {/* Mac Title Bar */}
+              <div className="bg-[#2d2d2d] border-b border-[#333] px-4 py-3 flex items-center">
+                <div className="flex space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-[#ff5f57] hover:brightness-90 transition"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#febc2e] hover:brightness-90 transition"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#28c840] hover:brightness-90 transition"></div>
                 </div>
+                <div className="mx-auto text-xs text-gray-500 font-medium flex items-center gap-2">
+                  <Terminal size={12} />
+                  {lang.prompts.title}
+                </div>
+                <div className="w-16"></div>
+              </div>
+              
+              {/* Terminal Body */}
+              <div className="p-6 text-sm min-h-[450px] max-h-[600px] flex flex-col bg-[#0d0d0d]">
+                {/* Terminal Header */}
+                <motion.div 
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  transition={{ delay: 0.2 }}
+                  className="text-gray-500 mb-4 space-y-1"
+                >
+                  <div><span className="text-[#28c840]"> ting@portfolio </span><span className="text-gray-600">:</span><span className="text-[#5ac8fa]">~</span><span className="text-gray-600">$</span> <span className="text-gray-400">./ask_about_ting.sh</span></div>
+                  <div className="text-gray-600 text-xs">Initializing AI context . . . Ready</div>
+                  <div className="text-gray-600 text-xs">Ask about Htet Aung Hlaing's Experience, Tech, Projects and Personal life growth . .</div>
+                  <div className="border-b border-[#333] my-2"></div>
+                </motion.div>
                 
                 {/* Chat History */}
-                <div className="flex-grow overflow-y-auto mb-6 space-y-4">
+                <div className="flex-grow overflow-y-auto mb-4 space-y-3">
                   {chatHistory.map((msg, index) => (
-                    <div key={index} className={`border-l-2 pl-4 py-1 ${msg.role === 'ai' ? 'border-green-500 text-gray-300' : 'border-blue-500 text-gray-400'}`}>
-                      <span className={`text-[10px] uppercase tracking-wider ${msg.role === 'ai' ? 'text-green-500/60' : 'text-blue-500/60'}`}>
-                        {msg.role === 'ai' ? 'AI' : 'You'}
+                    <motion.div 
+                      key={index} 
+                      initial={{ opacity: 0, x: msg.role === 'user' ? 10 : -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`pl-4 py-1 ${msg.role === 'ai' ? 'border-l-2 border-[#28c840]' : 'border-l-2 border-[#5ac8fa]'}`}
+                    >
+                      <span className={`text-[10px] uppercase tracking-wider font-bold ${msg.role === 'ai' ? 'text-[#28c840]' : 'text-[#5ac8fa]'}`}>
+                        {msg.role === 'ai' ? `$ ai --model ${connectedApi || 'gemini'}` : '$ you'}
                       </span>
-                      <div className="mt-1 whitespace-pre-wrap">{msg.content}</div>
-                    </div>
+                      <div className={`mt-1 whitespace-pre-wrap text-sm ${msg.role === 'ai' ? 'text-gray-300' : 'text-gray-400'}`}>{msg.content}</div>
+                    </motion.div>
                   ))}
-                  {isLoading && (
-                    <div className="border-l-2 border-green-500 pl-4 py-1 text-gray-400">
-                      <span className="text-[10px] uppercase tracking-wider text-green-500/60">AI</span>
-                      <div className="mt-1 flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        Thinking...
+                  {isConnecting && (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="border-l-2 border-[#febc2e] pl-4 py-1"
+                    >
+                      <span className="text-[10px] uppercase tracking-wider font-bold text-[#febc2e]">system</span>
+                      <div className="mt-1 flex items-center gap-2 text-gray-400">
+                        <div className="flex gap-1">
+                          <span className="w-1.5 h-1.5 bg-[#febc2e] rounded-full animate-bounce" style={{animationDelay: '0ms'}}></span>
+                          <span className="w-1.5 h-1.5 bg-[#febc2e] rounded-full animate-bounce" style={{animationDelay: '150ms'}}></span>
+                          <span className="w-1.5 h-1.5 bg-[#febc2e] rounded-full animate-bounce" style={{animationDelay: '300ms'}}></span>
+                        </div>
+                        connecting...
                       </div>
-                    </div>
+                    </motion.div>
                   )}
                 </div>
 
-                <div className="flex items-center mt-auto pt-4 border-t border-[#222]">
-                  <span className="text-green-400 mr-2">❯</span>
+                {/* Input */}
+                <div className="flex items-center pt-3 border-t border-[#333]">
+                  <span className="text-[#28c840] mr-2 font-bold">$</span>
                   <input
                     type="text"
                     value={promptInput}
                     onChange={(e) => setPromptInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handlePromptSubmit()}
                     placeholder={lang.prompts.placeholder}
-                    className="flex-1 bg-transparent border-none outline-none text-gray-200 placeholder-gray-600"
+                    className="flex-1 bg-transparent border-none outline-none text-gray-200 placeholder-gray-600 font-mono text-sm"
                     disabled={isLoading}
                   />
                   <button 
                     onClick={handlePromptSubmit}
                     disabled={isLoading || !promptInput.trim()}
-                    className="ml-2 text-gray-500 hover:text-green-400 transition-colors disabled:opacity-30"
+                    className="ml-2 text-gray-500 hover:text-[#28c840] transition-colors disabled:opacity-30"
                   >
-                    {isLoading ? <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div> : <Send size={18} />}
+                    {isLoading ? <div className="w-4 h-4 border-2 border-[#28c840] border-t-transparent rounded-full animate-spin"></div> : <Send size={18} />}
                   </button>
                 </div>
               </div>
@@ -1027,93 +1139,6 @@ Email: ${lang.profile.contact.emails[0]}
         </section>
 
       </main>
-
-      {/* Help Desk Auto-Reply Chatbot */}
-      <div className="fixed bottom-24 right-6 z-50">
-        {helpDeskOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="mb-4 w-80 bg-[var(--card)] border border-[var(--card-border)] rounded-2xl shadow-2xl overflow-hidden"
-          >
-            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                  <MessageCircle size={16} className="text-white" />
-                </div>
-                <div>
-                  <h4 className="text-white text-sm font-bold">Portfolio Assistant</h4>
-                  <p className="text-white/70 text-[10px]">Auto-reply • Always online</p>
-                </div>
-              </div>
-              <button onClick={() => setHelpDeskOpen(false)} className="text-white/70 hover:text-white">
-                <X size={18} />
-              </button>
-            </div>
-            
-            <div className="h-72 overflow-y-auto p-4 space-y-3 bg-[var(--bg)]">
-              {helpDeskHistory.length === 0 && (
-                <div className="text-center py-8">
-                  <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <MessageCircle size={24} className="text-white" />
-                  </div>
-                  <p className="text-[var(--muted)] text-xs">Hi! Ask me about Htet's experience, skills, or how to connect.</p>
-                </div>
-              )}
-              {helpDeskHistory.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] px-3 py-2 rounded-2xl text-xs leading-relaxed ${
-                    msg.role === 'user' 
-                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-br-md' 
-                      : 'bg-[var(--card)] border border-[var(--card-border)] text-[var(--fg)] rounded-bl-md'
-                  }`}>
-                    {msg.content}
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="p-3 border-t border-[var(--card-border)] bg-[var(--card)]">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={helpDeskInput}
-                  onChange={(e) => setHelpDeskInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleHelpDeskSubmit()}
-                  placeholder="Quick question..."
-                  className="flex-1 bg-[var(--bg)] border border-[var(--card-border)] rounded-full px-4 py-2 text-xs text-[var(--fg)] placeholder-[var(--muted)] outline-none focus:border-violet-500"
-                />
-                <button
-                  onClick={handleHelpDeskSubmit}
-                  disabled={!helpDeskInput.trim()}
-                  className="w-8 h-8 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full flex items-center justify-center text-white disabled:opacity-50"
-                >
-                  <Send size={14} />
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-1 mt-2">
-                {['Experience', 'Skills', 'Contact', 'Website'].map(q => (
-                  <button
-                    key={q}
-                    onClick={() => { setHelpDeskInput(q); setTimeout(handleHelpDeskSubmit, 100); }}
-                    className="px-2 py-1 bg-[var(--bg)] border border-[var(--card-border)] rounded-full text-[10px] text-[var(--muted)] hover:text-[var(--fg)] hover:border-violet-500 transition-colors"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-        
-        <button
-          onClick={() => setHelpDeskOpen(!helpDeskOpen)}
-          className="w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 text-white shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:scale-110 transition-all flex items-center justify-center"
-        >
-          {helpDeskOpen ? <X size={24} /> : <MessageCircle size={24} />}
-        </button>
-      </div>
     </div>
   );
 }
