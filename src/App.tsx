@@ -36,6 +36,7 @@ export default function App() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectedApi, setConnectedApi] = useState<string | null>(null);
   const [matrixSpeed, setMatrixSpeed] = useState(80);
+  const [contactClicks, setContactClicks] = useState(0);
 
   // Theme effect
   useEffect(() => {
@@ -81,7 +82,7 @@ export default function App() {
 
         const hostname = window.location.hostname || 'local';
         const browser = navigator.userAgent.split(' ').pop()?.split('(')[0] || 'Unknown';
-        const os = navigator.platform || navigator.userAgentData?.platform || 'Unknown';
+        const os = navigator.platform || 'Unknown';
 
         const visitorData = {
           ip,
