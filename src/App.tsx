@@ -418,8 +418,12 @@ Email: ${lang.profile.contact.emails[0]}`;
                   <Bot size={28} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">AI Executive Assistant</h3>
-                  <p className="text-white/80 text-sm">Powered by Google Gemini & OpenRouter</p>
+                  <h3 className="text-xl font-bold text-white">
+                    {language === 'mm' ? 'AI အကြံပေး လက်ထောက်' : language === 'zh' ? 'AI 执行助理' : 'AI Executive Assistant'}
+                  </h3>
+                  <p className="text-white/80 text-sm">
+                    {language === 'mm' ? 'Google Gemini & OpenRouter ဖြင့် အားဖြည့်ထားသည်' : language === 'zh' ? '由 Google Gemini 和 OpenRouter 提供支持' : 'Powered by Google Gemini & OpenRouter'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -428,16 +432,24 @@ Email: ${lang.profile.contact.emails[0]}`;
               <div className="flex items-start gap-3">
                 <CheckCircle size={18} className="text-green-400 mt-0.5 shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-[var(--fg)] text-sm">What I can do:</h4>
-                  <p className="text-[var(--muted)] text-xs mt-1">Answer questions about Htet's experience, skills, certifications, projects, and how he can contribute to your team.</p>
+                  <h4 className="font-semibold text-[var(--fg)] text-sm">
+                    {language === 'mm' ? 'ကျွန်တော် ဘာတွေ ကူညီနိုင်လဲ' : language === 'zh' ? '我能做什么' : 'What I can do:'}
+                  </h4>
+                  <p className="text-[var(--muted)] text-xs mt-1">
+                    {language === 'mm' ? 'Htet ၏ အတွေ့အကြုံ၊ ကျွမ်းကျင်မှု၊ အသိအမှတ်ပြုလက်မှတ်များ၊ စီမံကိန်းများနှင့် သင့်အဖွဲ့တွင် သူ ဘယ်လို ပါဝင်နိုင်ကြောင်း မေးခွန်းများကို ဖြေကြားပေးပါသည်။' : language === 'zh' ? '回答关于 Htet 的经验、技能、认证、项目以及他如何为您的团队做出贡献的问题。' : "Answer questions about Htet's experience, skills, certifications, projects, and how he can contribute to your team."}
+                  </p>
                 </div>
               </div>
               
               <div className="flex items-start gap-3">
                 <AlertTriangle size={18} className="text-amber-400 mt-0.5 shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-[var(--fg)] text-sm">I cannot help with:</h4>
-                  <p className="text-[var(--muted)] text-xs mt-1">Unrelated topics, other people, general knowledge, coding help, or anything outside Htet's professional profile.</p>
+                  <h4 className="font-semibold text-[var(--fg)] text-sm">
+                    {language === 'mm' ? 'ကျွန်တော် ကူညီမပေးနိုင်တာများ' : language === 'zh' ? '我无法帮助的事项' : 'I cannot help with:'}
+                  </h4>
+                  <p className="text-[var(--muted)] text-xs mt-1">
+                    {language === 'mm' ? 'ဆက်စပ်မရှိသော ခေါင်းစဉ်များ၊ အခြားလူများ၊ အထွေထွေ ဗဟုသုတ်၊ coding အကူအညီ သို့မဟုတ် Htet ၏ ပရော်ဖက်ရှင်နယ် profile ပြင်ပရှိ အရာအားလုံး။' : language === 'zh' ? '不相关的话题、其他人、一般知识、编程帮助或 Htet 专业档案之外的任何内容。' : "Unrelated topics, other people, general knowledge, coding help, or anything outside Htet's professional profile."}
+                  </p>
                 </div>
               </div>
 
@@ -445,8 +457,18 @@ Email: ${lang.profile.contact.emails[0]}`;
                 <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
                   <AlertTriangle size={18} className="text-amber-400 mt-0.5 shrink-0" />
                   <div>
-                    <h4 className="font-semibold text-amber-400 text-sm">Myanmar Users Notice</h4>
-                    <p className="text-[var(--muted)] text-xs mt-1">Google Gemini API has limited support in Myanmar. You can interact in <strong className="text-[var(--fg)]">English</strong> or <strong className="text-[var(--fg)]">Chinese</strong> only. For Burmese language support, please use a VPN.</p>
+                    <h4 className="font-semibold text-amber-400 text-sm">
+                      {language === 'mm' ? 'မြန်မာ အသုံးပြုသူ အကြောင်းကြားချက်' : language === 'zh' ? '缅甸用户通知' : 'Myanmar Users Notice'}
+                    </h4>
+                    <p className="text-[var(--muted)] text-xs mt-1">
+                      {language === 'mm' ? (
+                        <>This AI assistant uses <strong className="text-[var(--fg)]">OpenRouter API</strong> for Myanmar visitors, which works best with <strong className="text-[var(--fg)]">English</strong> and <strong className="text-[var(--fg)]">Chinese</strong> only. If you prefer <strong className="text-amber-400">Burmese language</strong>, please use a <strong className="text-[var(--fg)]">VPN</strong> and refresh — this will connect to <strong className="text-[var(--fg)]">Gemini API</strong> which supports Burmese more accurately.</>
+                      ) : language === 'zh' ? (
+                        <>此 AI 助手对缅甸访客使用 <strong className="text-[var(--fg)]">OpenRouter API</strong>，仅支持 <strong className="text-[var(--fg)]">英语</strong> 和 <strong className="text-[var(--fg)]">中文</strong>。如果您偏好 <strong className="text-amber-400">缅甸语</strong>，请使用 <strong className="text-[var(--fg)]">VPN</strong> 并刷新页面 — 这将连接到支持更准确缅甸语的 <strong className="text-[var(--fg)]">Gemini API</strong>。</>
+                      ) : (
+                        <>This AI assistant uses <strong className="text-[var(--fg)]">OpenRouter API</strong> for Myanmar visitors, which works best with <strong className="text-[var(--fg)]">English</strong> and <strong className="text-[var(--fg)]">Chinese</strong> only. If you prefer <strong className="text-amber-400">Burmese language</strong>, please use a <strong className="text-[var(--fg)]">VPN</strong> and refresh — this will connect to <strong className="text-[var(--fg)]">Gemini API</strong> which supports Burmese more accurately.</>
+                      )}
+                    </p>
                   </div>
                 </div>
               )}
@@ -454,8 +476,12 @@ Email: ${lang.profile.contact.emails[0]}`;
               <div className="flex items-start gap-3">
                 <Wifi size={18} className="text-blue-400 mt-0.5 shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-[var(--fg)] text-sm">How to use:</h4>
-                  <p className="text-[var(--muted)] text-xs mt-1">Ask about Htet's SAP experience, tech stack, certifications, or why he's a great fit for your team. Click below to start chatting!</p>
+                  <h4 className="font-semibold text-[var(--fg)] text-sm">
+                    {language === 'mm' ? 'ဘယ်လို အသုံးပြုရမလဲ' : language === 'zh' ? '如何使用' : 'How to use:'}
+                  </h4>
+                  <p className="text-[var(--muted)] text-xs mt-1">
+                    {language === 'mm' ? 'Htet ၏ SAP အတွေ့အကြုံ၊ နည်းပညာ stack၊ အသိအမှတ်ပြုလက်မှတ်များ သို့မဟုတ် သင့်အဖွဲ့အတွက် သူ ဘယ်လို သင့်တောင့်တင့်ကြောင်း မေးမြန်းပါ။' : language === 'zh' ? '询问 Htet 的 SAP 经验、技术栈、认证，或了解他为什么适合您的团队。点击下方开始聊天！' : "Ask about Htet's SAP experience, tech stack, certifications, or why he's a great fit for your team. Click below to start chatting!"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -463,16 +489,16 @@ Email: ${lang.profile.contact.emails[0]}`;
             <div className="p-4 border-t border-[var(--card-border)] bg-[var(--bg)] flex gap-3">
               <button 
                 onClick={() => setAiWarningOpen(false)}
-                className="flex-1 px-4 py-2 border border-[var(--card-border)] rounded-lg text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)] transition-colors text-sm"
+                className="flex-1 px-4 py-2 border border-[var(--card-border)] rounded-lg text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)] transition-colors text-sm font-bold"
               >
-                Maybe Later
+                {language === 'mm' ? 'နောက်မှ' : language === 'zh' ? '稍后再说' : 'Maybe Later'}
               </button>
               <a 
                 href="#ai"
                 onClick={() => setAiWarningOpen(false)}
-                className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-medium text-center text-sm hover:shadow-lg hover:shadow-green-500/30 transition-all"
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-bold text-center text-sm hover:shadow-lg hover:shadow-green-500/30 transition-all"
               >
-                Start Chatting
+                {language === 'mm' ? 'Chat စတင်ရန်' : language === 'zh' ? '开始聊天' : 'Start Chatting'}
               </a>
             </div>
           </motion.div>
@@ -566,7 +592,6 @@ Email: ${lang.profile.contact.emails[0]}`;
           { id: 'experience', icon: Briefcase, label: 'Experience', color: 'from-amber-500 to-orange-500' },
           { id: 'githubRepos', icon: Github, label: 'Repos', color: 'from-slate-600 to-gray-700' },
           { id: 'skills', icon: Cpu, label: 'Skills', color: 'from-emerald-500 to-teal-500' },
-          { id: 'ai', icon: Terminal, label: 'AI Chat', color: 'from-green-500 to-emerald-600' }
         ].map((item) => (
           <a
             key={item.id}
@@ -582,6 +607,18 @@ Email: ${lang.profile.contact.emails[0]}`;
             <span className="text-[10px] mt-1 font-extrabold hidden md:block">{item.label}</span>
           </a>
         ))}
+        <button
+          onClick={() => setAiWarningOpen(true)}
+          className={`relative flex flex-col items-center justify-center px-3.5 py-2.5 rounded-xl transition-all duration-300 font-bold ${
+            activeSection === 'ai' 
+              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg scale-110 shadow-black/30' 
+              : 'text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)] hover:shadow-md'
+          }`}
+          title="AI Chat"
+        >
+          <Terminal size={20} strokeWidth={2.5} />
+          <span className="text-[10px] mt-1 font-extrabold hidden md:block">AI Chat</span>
+        </button>
         <div className="w-px h-10 bg-gradient-to-b from-transparent via-[var(--card-border)] to-transparent mx-1.5"></div>
         <button 
           onClick={toggleLanguage} 
@@ -654,25 +691,36 @@ Email: ${lang.profile.contact.emails[0]}`;
             </div>
 
             <div className="lg:col-span-4 flex justify-center lg:justify-end relative">
-              {/* Binary Matrix Rain Canvas */}
+              {/* Binary Matrix Rain Canvas - Background */}
               <canvas 
                 ref={(canvas) => {
                   if (!canvas) return;
                   const ctx = canvas.getContext('2d');
                   if (!ctx) return;
-                  canvas.width = 120;
-                  canvas.height = 400;
-                  const chars = '01アイウエオカキクケコサシスセソタチツテト';
+                  canvas.width = 200;
+                  canvas.height = 500;
+                  
+                  // Language-based binary + katakana
+                  const binaryChars: Record<LanguageKey, string> = {
+                    en: '01',
+                    mm: '၀၁',
+                    zh: '零壹〇一',
+                  };
+                  const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+                  const chars = binaryChars[language] + katakana;
                   const fontSize = 14;
                   const columns = Math.floor(canvas.width / fontSize);
                   const drops: number[] = Array(columns).fill(1);
+                  let animFrame: number;
+                  
                   const isDark = document.documentElement.classList.contains('dark');
                   
                   const draw = () => {
-                    ctx.fillStyle = isDark ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+                    ctx.fillStyle = isDark ? 'rgba(5,5,5,0.06)' : 'rgba(255,255,255,0.06)';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     ctx.fillStyle = isDark ? '#00ff41' : '#166534';
                     ctx.font = `${fontSize}px monospace`;
+                    ctx.globalAlpha = 0.7;
                     
                     for (let i = 0; i < drops.length; i++) {
                       const text = chars[Math.floor(Math.random() * chars.length)];
@@ -682,20 +730,23 @@ Email: ${lang.profile.contact.emails[0]}`;
                       }
                       drops[i]++;
                     }
+                    ctx.globalAlpha = 1;
+                    animFrame = requestAnimationFrame(draw);
                   };
                   
-                  const interval = setInterval(draw, 50);
-                  return () => clearInterval(interval);
+                  draw();
+                  return () => cancelAnimationFrame(animFrame);
                 }}
-                className="absolute -left-16 top-0 opacity-40 pointer-events-none rounded-lg hidden lg:block"
-                style={{ width: 120, height: 400 }}
+                className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none rounded-xl"
+                style={{ width: 200, height: 500 }}
               />
               
+              {/* Profile Image - In Front */}
               <motion.div 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsImageZoomed(true)}
-                className="relative group cursor-zoom-in"
+                className="relative group cursor-zoom-in z-10"
               >
                 <div className="absolute -inset-1 bg-gradient-to-r from-[var(--accent)] to-emerald-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
                 <div className="relative w-64 h-80 md:w-72 md:h-96 rounded-2xl overflow-hidden border-2 border-[var(--accent)]/30 bg-[var(--card)] shadow-2xl">
