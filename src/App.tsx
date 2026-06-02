@@ -32,6 +32,9 @@ export default function App() {
   const [viewCount, setViewCount] = useState(0);
   const [recentVisitors, setRecentVisitors] = useState<Array<{ ip: string; country: string; city: string; hostname: string; browser: string; os: string; views: number; lastVisit: string }>>([]);
   const [chatHistory, setChatHistory] = useState<Array<{ role: 'user' | 'ai'; content: string }>>([]);
+  const [helpDeskOpen, setHelpDeskOpen] = useState(false);
+  const [helpDeskInput, setHelpDeskInput] = useState('');
+  const [helpDeskHistory, setHelpDeskHistory] = useState<Array<{ role: 'user' | 'bot'; content: string }>>([]);
 
   // Theme effect
   useEffect(() => {
@@ -50,7 +53,7 @@ export default function App() {
   // Scroll spy for active section
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['about', 'experience', 'projects', 'githubRepos', 'skills', 'ai'];
+      const sections = ['about', 'experience', 'githubRepos', 'skills', 'ai'];
       const scrollPosition = window.scrollY + 200; // Offset
 
       for (const section of sections) {
@@ -123,14 +126,24 @@ export default function App() {
     setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
     setPromptInput('');
     
+    const languageMap: Record<LanguageKey, string> = {
+      en: 'English',
+      mm: 'Myanmar (Burmese)',
+      zh: 'Chinese (Simplified)',
+    };
+
     const systemPrompt = `You are Htet Aung Hlaing's (ting) personal AI assistant embedded in his portfolio website. Your ONLY purpose is to represent him professionally.
+
+## CRITICAL LANGUAGE RULE:
+You MUST respond in ${languageMap[language]} language. The website is currently set to ${languageMap[language]}. Match the user's input language: if they ask in Myanmar, respond in Myanmar. If Chinese, respond in Chinese. If English, respond in English. ALWAYS use ${languageMap[language]} as the primary response language.
 
 ## STRICT RULES:
 1. ONLY answer questions related to Htet Aung Hlaing's profile, experience, skills, certifications, projects, education, or how he can contribute to a team/company.
-2. If asked about anything unrelated (politics, other people, general knowledge, coding help, etc.), politely decline and redirect: "I'm here to share about Htet Aung Hlaing's professional background. Feel free to ask about his experience, skills, or how he can contribute to your team!"
+2. If asked about anything unrelated (politics, other people, general knowledge, coding help, etc.), politely decline and redirect in ${languageMap[language]}: "I'm here to share about Htet Aung Hlaing's professional background. Feel free to ask about his experience, skills, or how he can contribute to your team!"
 3. Always frame answers from a HIRING MANAGER perspective - explain WHY his skills matter, what value he brings, and where he fits best.
 4. Be concise, confident, and professional - like a top recruiter pitching a candidate.
 5. Use bullet points for clarity when listing skills or experience.
+6. If someone asks about this website, mention it's built with React + Vite + Tailwind CSS and the source code is at https://github.com/tinghah/tinghah.github.io
 
 ## HTET AUNG HLAING'S PROFILE:
 Name: ${lang.profile.name}
@@ -260,6 +273,61 @@ Email: ${lang.profile.contact.emails[0]}
     }
 
     setIsLoading(false);
+  };
+
+  // Help Desk Auto-Reply
+  const helpDeskReplies: Record<string, { en: string; mm: string; zh: string }> = {
+    greeting: {
+      en: "Hello! Welcome to Htet Aung Hlaing's portfolio. I'm here to help you learn about his experience and skills. What would you like to know?",
+      mm: "မင်္ဂလာပါ! Htet Aung Hlaing ၏ portfolio သို့ ကြိုဆိုပါသည်။ သူ၏ အတွေ့အကြုံနှင့် ကျွမ်းကျင်မှုများအကြောင်း သင့်အား ကူညီပေးလိုပါသည်။ ဘာသိချင်လဲ?",
+      zh: "你好！欢迎来到 Htet Aung Hlaing 的作品集。我在这里帮助您了解他的经验和技能。您想了解什么？"
+    },
+    experience: {
+      en: "Htet has 4+ years of IT experience spanning SAP MES/WMS integration, network infrastructure, and AI solutions. His most recent role is IT Project Coordinator at Pouchen Myanmar Adidas (PMA). Want to know about specific skills?",
+      mm: "Htet တွင် SAP MES/WMS ပေါင်းစပ်မှု၊ ကွန်ယက်အခြေခံအဆောက်အအုံနှင့် AI ဖြေရှင်းချက်များအပါအဝင် IT အတွေ့အကြုံ ၄+ နှစ်ရှိသည်။ အဓိက ကျွမ်းကျင်မှုများအကြောင်း သိချင်လား?",
+      zh: "Htet 拥有 4 年以上 IT 经验，涵盖 SAP MES/WMS 集成、网络基础设施和 AI 解决方案。他最近的职位是 Pouchen Myanmar Adidas (PMA) 的 IT 项目协调员。想了解具体技能吗？"
+    },
+    skills: {
+      en: "Core skills: SAP MES/WMS Integration, Enterprise IT Architecture, Data Analytics (Power BI, SQL, Python), AI Tool Integration, Project Management, Network Security. He also holds 9+ certifications including Google IT Support and Fortinet Cybersecurity.",
+      mm: "အဓိက ကျွမ်းကျင်မှုများ - SAP MES/WMS ပေါင်းစပ်မှု၊ လုပ်ငန်းသုံး IT ဗိသုကာပညာ၊ ဒေတာခွဲခြမ်းစိတ်ဖြာမှု၊ AI ကိရိယာပေါင်းစပ်မှု၊ စီမံခန့်ခွဲမှု။ Google IT Support နှင့် Fortinet Cybersecurity အပါအဝင် ใပေါင်း ၉+ အသိအမှတ်ပြုလက်မှတ်များ ရှိသည်။",
+      zh: "核心技能：SAP MES/WMS 集成、企业 IT 架构、数据分析（Power BI, SQL, Python）、AI 工具集成、项目管理、网络安全。他还拥有 9 项以上认证，包括 Google IT Support 和 Fortinet Cybersecurity。"
+    },
+    contact: {
+      en: "You can reach Htet via:\n- LinkedIn: linkedin.com/in/tinghah\n- Email: ting.pouchen@gmail.com\n- Telegram: @ting_hah\n- GitHub: github.com/tinghah\n\nHe's based in Yangon, Myanmar and open to opportunities!",
+      mm: "Htet ကို ဆက်သွယ်နိုင်ပါသည် -\n- LinkedIn: linkedin.com/in/tinghah\n- Email: ting.pouchen@gmail.com\n- Telegram: @ting_hah\n- GitHub: github.com/tinghah\n\nရန်ကုန်၊ မြန်မာတွင် အခြေစိုက်ပြီး အခွင့်အလမ်းများအတွက် ဖွင့်လင့်ထားသည်!",
+      zh: "您可以通过以下方式联系 Htet：\n- LinkedIn: linkedin.com/in/tinghah\n- Email: ting.pouchen@gmail.com\n- Telegram: @ting_hah\n- GitHub: github.com/tinghah\n\n他位于缅甸仰光，欢迎各种机会！"
+    },
+    website: {
+      en: "This portfolio website is built with React + Vite + Tailwind CSS, featuring AI chat integration and multi-language support. Source code: https://github.com/tinghah/tinghah.github.io",
+      mm: "ဤ portfolio ဝဘ်ဆိုက်ကို React + Vite + Tailwind CSS ဖြင့် တည်ဆောက်ထားပြီး AI chat ပေါင်းစပ်မှုနှင့် ဘာသာစကားများစွာ ပံ့ပိုးမှု ပါဝင်သည်။ Source code: https://github.com/tinghah/tinghah.github.io",
+      zh: "这个作品集网站使用 React + Vite + Tailwind CSS 构建，具有 AI 聊天集成和多语言支持。源代码：https://github.com/tinghah/tinghah.github.io"
+    },
+    fallback: {
+      en: "I can help you learn about Htet's experience, skills, certifications, or how to contact him. You can also ask about this website. What interests you?",
+      mm: "Htet ၏ အတွေ့အကြုံ၊ ကျွမ်းကျင်မှု၊ အသိအမှတ်ပြုလက်မှတ်များ သို့မဟုတ် ဆက်သွယ်ပုံအကြောင်း သင့်အား ကူညီပေးနိုင်ပါသည်။ ဘာကို စိတ်ဝင်စားလဲ?",
+      zh: "我可以帮助您了解 Htet 的经验、技能、认证或联系方式。您也可以询问有关此网站的问题。您对什么感兴趣？"
+    },
+  };
+
+  const getHelpDeskReply = (input: string): string => {
+    const lower = input.toLowerCase();
+    if (lower.match(/\b(hi|hello|hey|greetings|မင်္ဂလာ|你好)\b/)) return helpDeskReplies.greeting[language];
+    if (lower.match(/\b(experience|work|job|career|role|position|အလုပ်|经验|工作)\b/)) return helpDeskReplies.experience[language];
+    if (lower.match(/\b(skills?| abilities|competenc|ကျွမ်းကျင်|技能|能力)\b/)) return helpDeskReplies.skills[language];
+    if (lower.match(/\b(contact|reach|email|phone|linkedin|telegram|ဆက်သွယ်|联系|邮箱)\b/)) return helpDeskReplies.contact[language];
+    if (lower.match(/\b(website|site|portfolio|git|repo|built|code|ဝဘ်|网站|源码)\b/)) return helpDeskReplies.website[language];
+    return helpDeskReplies.fallback[language];
+  };
+
+  const handleHelpDeskSubmit = () => {
+    if (!helpDeskInput.trim()) return;
+    const userMsg = helpDeskInput;
+    setHelpDeskHistory(prev => [...prev, { role: 'user', content: userMsg }]);
+    setHelpDeskInput('');
+    setTimeout(() => {
+      const reply = getHelpDeskReply(userMsg);
+      setHelpDeskHistory(prev => [...prev, { role: 'bot', content: reply }]);
+    }, 500);
   };
 
   return (
@@ -454,33 +522,35 @@ Email: ${lang.profile.contact.emails[0]}
       )}
 
       {/* Floating Glass Navigation */}
-      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-6 py-3 flex items-center space-x-6 shadow-2xl">
+      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-6 py-3 flex items-center space-x-1 shadow-2xl border border-white/10 dark:border-white/10 border-gray-200/50">
         {[
-          { id: 'about', icon: User, label: 'About' },
-          { id: 'experience', icon: Briefcase, label: 'Experience' },
-          { id: 'projects', icon: Code, label: 'Projects' },
-          { id: 'githubRepos', icon: Github, label: 'Repos' },
-          { id: 'skills', icon: Cpu, label: 'Skills' },
-          { id: 'ai', icon: Terminal, label: 'AI Chat' }
+          { id: 'about', icon: User, label: 'About', color: 'from-pink-500 to-rose-500' },
+          { id: 'experience', icon: Briefcase, label: 'Experience', color: 'from-amber-500 to-orange-500' },
+          { id: 'githubRepos', icon: Github, label: 'Repos', color: 'from-slate-600 to-gray-700' },
+          { id: 'skills', icon: Cpu, label: 'Skills', color: 'from-emerald-500 to-teal-500' },
+          { id: 'ai', icon: Terminal, label: 'AI Chat', color: 'from-green-500 to-emerald-600' }
         ].map((item) => (
           <a
             key={item.id}
             href={`#${item.id}`}
-            className={`flex flex-col items-center justify-center transition-all duration-300 ${activeSection === item.id ? 'text-[var(--accent)] scale-110' : 'text-[var(--muted)] hover:text-[var(--fg)]'}`}
+            className={`relative flex flex-col items-center justify-center px-3 py-2 rounded-full transition-all duration-300 ${
+              activeSection === item.id 
+                ? `bg-gradient-to-r ${item.color} text-white shadow-lg scale-105` 
+                : 'text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)]'
+            }`}
             title={item.label}
           >
-            <item.icon size={20} />
-            <span className="text-[10px] mt-1 font-medium hidden md:block">{item.label}</span>
+            <item.icon size={18} />
+            <span className="text-[9px] mt-0.5 font-semibold hidden md:block">{item.label}</span>
           </a>
         ))}
-        <div className="w-px h-6 bg-[var(--card-border)] mx-2"></div>
-        <button onClick={toggleLanguage} className="text-[var(--muted)] hover:text-[var(--fg)] transition-colors flex items-center gap-1">
+        <div className="w-px h-8 bg-gradient-to-b from-transparent via-[var(--card-border)] to-transparent mx-1"></div>
+        <button onClick={toggleLanguage} className="relative flex flex-col items-center justify-center px-3 py-2 rounded-full text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)] transition-all" title="Language">
           <Languages size={18} />
-          <span className="text-[10px] font-bold uppercase">{language}</span>
+          <span className="text-[9px] mt-0.5 font-bold uppercase">{language}</span>
         </button>
-        <div className="w-px h-6 bg-[var(--card-border)] mx-2"></div>
-        <button onClick={toggleTheme} className="text-[var(--muted)] hover:text-[var(--fg)] transition-colors">
-          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        <button onClick={toggleTheme} className="relative flex flex-col items-center justify-center px-3 py-2 rounded-full text-[var(--muted)] hover:text-[var(--fg)] hover:bg-[var(--card)] transition-all" title="Theme">
+          {theme === 'dark' ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-indigo-400" />}
         </button>
       </nav>
 
@@ -957,6 +1027,93 @@ Email: ${lang.profile.contact.emails[0]}
         </section>
 
       </main>
+
+      {/* Help Desk Auto-Reply Chatbot */}
+      <div className="fixed bottom-24 right-6 z-50">
+        {helpDeskOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="mb-4 w-80 bg-[var(--card)] border border-[var(--card-border)] rounded-2xl shadow-2xl overflow-hidden"
+          >
+            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                  <MessageCircle size={16} className="text-white" />
+                </div>
+                <div>
+                  <h4 className="text-white text-sm font-bold">Portfolio Assistant</h4>
+                  <p className="text-white/70 text-[10px]">Auto-reply • Always online</p>
+                </div>
+              </div>
+              <button onClick={() => setHelpDeskOpen(false)} className="text-white/70 hover:text-white">
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div className="h-72 overflow-y-auto p-4 space-y-3 bg-[var(--bg)]">
+              {helpDeskHistory.length === 0 && (
+                <div className="text-center py-8">
+                  <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <MessageCircle size={24} className="text-white" />
+                  </div>
+                  <p className="text-[var(--muted)] text-xs">Hi! Ask me about Htet's experience, skills, or how to connect.</p>
+                </div>
+              )}
+              {helpDeskHistory.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] px-3 py-2 rounded-2xl text-xs leading-relaxed ${
+                    msg.role === 'user' 
+                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-br-md' 
+                      : 'bg-[var(--card)] border border-[var(--card-border)] text-[var(--fg)] rounded-bl-md'
+                  }`}>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="p-3 border-t border-[var(--card-border)] bg-[var(--card)]">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={helpDeskInput}
+                  onChange={(e) => setHelpDeskInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleHelpDeskSubmit()}
+                  placeholder="Quick question..."
+                  className="flex-1 bg-[var(--bg)] border border-[var(--card-border)] rounded-full px-4 py-2 text-xs text-[var(--fg)] placeholder-[var(--muted)] outline-none focus:border-violet-500"
+                />
+                <button
+                  onClick={handleHelpDeskSubmit}
+                  disabled={!helpDeskInput.trim()}
+                  className="w-8 h-8 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full flex items-center justify-center text-white disabled:opacity-50"
+                >
+                  <Send size={14} />
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {['Experience', 'Skills', 'Contact', 'Website'].map(q => (
+                  <button
+                    key={q}
+                    onClick={() => { setHelpDeskInput(q); setTimeout(handleHelpDeskSubmit, 100); }}
+                    className="px-2 py-1 bg-[var(--bg)] border border-[var(--card-border)] rounded-full text-[10px] text-[var(--muted)] hover:text-[var(--fg)] hover:border-violet-500 transition-colors"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+        
+        <button
+          onClick={() => setHelpDeskOpen(!helpDeskOpen)}
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 text-white shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:scale-110 transition-all flex items-center justify-center"
+        >
+          {helpDeskOpen ? <X size={24} /> : <MessageCircle size={24} />}
+        </button>
+      </div>
     </div>
   );
 }
