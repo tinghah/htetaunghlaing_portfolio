@@ -693,7 +693,7 @@ Email: ${lang.profile.contact.emails[0]}`;
 
             <div className="lg:col-span-4 flex justify-center lg:justify-end relative" style={{ minHeight: 420 }}>
               {/* Binary Matrix Rain Canvas - Behind Profile */}
-              <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center">
                 <canvas 
                   ref={(canvas) => {
                     if (!canvas) return;
@@ -714,7 +714,6 @@ Email: ${lang.profile.contact.emails[0]}`;
                     const drops: number[] = Array(columns).fill(1);
                     let animFrame: number;
                     let lastTime = 0;
-                    const isDark = document.documentElement.classList.contains('dark');
                     
                     const draw = (timestamp: number) => {
                       if (timestamp - lastTime < matrixSpeed) {
@@ -723,28 +722,27 @@ Email: ${lang.profile.contact.emails[0]}`;
                       }
                       lastTime = timestamp;
                       
-                      ctx.fillStyle = isDark ? 'rgba(5,5,5,0.08)' : 'rgba(255,255,255,0.08)';
+                      ctx.fillStyle = 'rgba(255,255,255,0.05)';
                       ctx.fillRect(0, 0, canvas.width, canvas.height);
-                      ctx.fillStyle = isDark ? '#00ff41' : '#166534';
                       ctx.font = `${fontSize}px monospace`;
-                      ctx.globalAlpha = 0.6;
                       
                       for (let i = 0; i < drops.length; i++) {
                         const text = chars[Math.floor(Math.random() * chars.length)];
-                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        const y = drops[i] * fontSize;
+                        ctx.fillStyle = `rgba(144, 238, 144, ${0.6 + Math.random() * 0.4})`;
+                        ctx.fillText(text, i * fontSize, y);
+                        if (y > canvas.height && Math.random() > 0.975) {
                           drops[i] = 0;
                         }
-                        drops[i]++;
+                        drops[i] += 0.3;
                       }
-                      ctx.globalAlpha = 1;
                       animFrame = requestAnimationFrame(draw);
                     };
                     
                     animFrame = requestAnimationFrame(draw);
                     return () => cancelAnimationFrame(animFrame);
                   }}
-                  className="opacity-40 pointer-events-none"
+                  className="pointer-events-none"
                   style={{ width: 280, height: 500 }}
                 />
               </div>
@@ -770,8 +768,8 @@ Email: ${lang.profile.contact.emails[0]}`;
                 onClick={() => setIsImageZoomed(true)}
                 className="relative group cursor-zoom-in z-10"
               >
-                <div className="absolute -inset-1 bg-gradient-to-r from-[var(--accent)] to-emerald-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                <div className="relative w-64 h-80 md:w-72 md:h-96 rounded-2xl overflow-hidden border-2 border-[var(--accent)]/30 bg-[var(--card)] shadow-2xl">
+                <div className="absolute -inset-1 rounded-2xl blur"></div>
+                <div className="relative w-64 h-80 md:w-72 md:h-96 rounded-2xl overflow-hidden bg-[var(--card)] shadow-2xl">
                   <img 
                     src={lang.profile.profileImage} 
                     alt={lang.profile.name} 
