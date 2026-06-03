@@ -8,7 +8,9 @@ This project is built using modern web technologies to ensure high performance, 
 
 ## 🌐 Live Site
 
-Preview the live site at [tinghah.github.io](https://tinghah.github.io)
+Preview the live site at [portfolio.tinghah.online](https://portfolio.tinghah.online)
+
+[tinghah.github.io](https://tinghah.github.io)
 
 ## 🚀 Tech Stack
 
