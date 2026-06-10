@@ -6,7 +6,7 @@ Welcome to the source code for my professional portfolio website! I am an IT Sys
 
 This project is built using modern web technologies to ensure high performance, maintainability, and an excellent user experience.
 
-## 🌐 Live Site
+## 🌐 Live Site .
 
 Preview the live site at [portfolio.tinghah.online](https://portfolio.tinghah.online)
 
